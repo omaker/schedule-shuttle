@@ -110,31 +110,34 @@ export const ShippingColumn = ({
                     draggableId={item.id} 
                     index={index}
                   >
-                    {(provided, snapshot) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        className={`shipping-card ${
-                          selectedItems.includes(item.id) && snapshot.isDragging 
-                            ? "rotate-2 scale-105 shadow-lg" 
-                            : selectedItems.includes(item.id) && selectedItems.some(id => 
-                                items.find(i => i.id === id)?.status === item.status && 
-                                document.querySelector(`[data-rbd-draggable-id="${id}"]`)?.getAttribute('aria-grabbed') === 'true'
-                              )
-                            ? "rotate-2 scale-105 shadow-lg" 
-                            : ""
-                        }`}
-                        data-item-id={item.id}
-                      >
-                        <ShippingCard 
-                          item={item} 
-                          getStatusColor={getStatusColor}
-                          isSelected={selectedItems.includes(item.id)}
-                          onSelect={() => {}}
-                        />
-                      </div>
-                    )}
+                    {(provided, snapshot) => {
+                      // Check if any item in the same group is being dragged
+                      const isAnyGroupItemDragging = selectedItems.some(id => 
+                        document.querySelector(`[data-rbd-draggable-id="${id}"]`)?.getAttribute('aria-grabbed') === 'true'
+                      );
+
+                      // Apply animation if this item is selected and either it's being dragged or any item in its group is being dragged
+                      const shouldAnimate = selectedItems.includes(item.id) && (snapshot.isDragging || isAnyGroupItemDragging);
+
+                      return (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          className={`shipping-card ${
+                            shouldAnimate ? "rotate-2 scale-105 shadow-lg" : ""
+                          }`}
+                          data-item-id={item.id}
+                        >
+                          <ShippingCard 
+                            item={item} 
+                            getStatusColor={getStatusColor}
+                            isSelected={selectedItems.includes(item.id)}
+                            onSelect={() => {}}
+                          />
+                        </div>
+                      );
+                    }}
                   </Draggable>
                 ))}
                 {provided.placeholder}
