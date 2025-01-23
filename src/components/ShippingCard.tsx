@@ -3,7 +3,6 @@ import { Badge } from "@/components/ui/badge";
 import { ShippingItem } from "@/types/shipping";
 import { Ship, Anchor, Weight, Calendar } from "lucide-react";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
-import { Checkbox } from "@/components/ui/checkbox";
 
 interface ShippingCardProps {
   item: ShippingItem;
@@ -12,20 +11,15 @@ interface ShippingCardProps {
   onSelect: (id: string) => void;
 }
 
-export const ShippingCard = ({ item, getStatusColor, isSelected, onSelect }: ShippingCardProps) => {
+export const ShippingCard = ({ item, getStatusColor, isSelected }: ShippingCardProps) => {
   return (
     <HoverCard>
       <HoverCardTrigger asChild>
         <Card className={`p-2 transition-all transform hover:shadow-md hover:-translate-y-0.5 bg-gradient-to-br from-slate-50 to-slate-100 ${
-          isSelected ? 'ring-2 ring-mint-500' : ''
+          isSelected ? 'ring-2 ring-mint-500 bg-mint-50' : ''
         }`}>
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <Checkbox
-                checked={isSelected}
-                onCheckedChange={() => onSelect(item.id)}
-                className="data-[state=checked]:bg-mint-500"
-              />
               <Badge className={`${getStatusColor(item.status)} animate-fade-in flex items-center gap-1 text-xs`}>
                 <Ship className="w-3 h-3" />
                 {item.status}
