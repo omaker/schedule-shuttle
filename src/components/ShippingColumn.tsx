@@ -12,8 +12,8 @@ interface ShippingColumnProps {
 
 export const ShippingColumn = ({ columnId, title, items, getStatusColor }: ShippingColumnProps) => {
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg border-2 border-mint-100 transition-transform hover:shadow-xl">
-      <h2 className="text-xl font-semibold mb-4 text-mint-700">{title}</h2>
+    <div className="bg-white p-4 rounded-lg shadow-lg border-2 border-mint-100 transition-transform hover:shadow-xl">
+      <h2 className="text-lg font-semibold mb-3 text-mint-700">{title}</h2>
       <Droppable droppableId={columnId}>
         {(provided, snapshot) => (
           <div
@@ -23,8 +23,8 @@ export const ShippingColumn = ({ columnId, title, items, getStatusColor }: Shipp
               snapshot.isDraggingOver ? "bg-mint-50" : ""
             }`}
           >
-            <ScrollArea className="h-[600px]">
-              <div className="space-y-4 p-1">
+            <ScrollArea className="h-[700px]">
+              <div className="space-y-2 p-1">
                 {items.map((item, index) => (
                   <Draggable key={item.id} draggableId={item.id} index={index}>
                     {(provided, snapshot) => (
@@ -32,7 +32,7 @@ export const ShippingColumn = ({ columnId, title, items, getStatusColor }: Shipp
                         ref={provided.innerRef}
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
-                        className={snapshot.isDragging ? "rotate-3 scale-105" : ""}
+                        className={snapshot.isDragging ? "rotate-2 scale-105" : ""}
                       >
                         <ShippingCard item={item} getStatusColor={getStatusColor} />
                       </div>
