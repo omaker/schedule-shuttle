@@ -27,13 +27,17 @@ export const ShippingColumn = ({
   const columnRef = useRef<HTMLDivElement>(null);
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (columnRef.current) {
-      const rect = columnRef.current.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      setSelectionStart({ x, y });
-      setSelectionEnd({ x, y });
-      setIsSelecting(true);
+    // Reset selection if clicking outside of any card
+    const target = e.target as HTMLElement;
+    if (!target.closest('.shipping-card')) {
+      if (columnRef.current) {
+        const rect = columnRef.current.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        setSelectionStart({ x, y });
+        setSelectionEnd({ x, y });
+        setIsSelecting(true);
+      }
     }
   };
 
@@ -105,7 +109,6 @@ export const ShippingColumn = ({
                     key={item.id} 
                     draggableId={item.id} 
                     index={index}
-                    isDragDisabled={!selectedItems.includes(item.id) && selectedItems.length > 0}
                   >
                     {(provided, snapshot) => (
                       <div

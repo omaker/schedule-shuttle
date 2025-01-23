@@ -158,6 +158,7 @@ const Dashboard = () => {
           status: destination.droppableId as ShippingItem["status"],
         }));
 
+        // Insert all selected items at the destination index
         destItems.splice(destination.index, 0, ...updatedItemsToMove);
         
         setColumns({
