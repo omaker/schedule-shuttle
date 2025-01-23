@@ -8,9 +8,18 @@ interface ShippingColumnProps {
   title: string;
   items: ShippingItem[];
   getStatusColor: (status: string) => string;
+  selectedItems: string[];
+  onSelectItem: (id: string) => void;
 }
 
-export const ShippingColumn = ({ columnId, title, items, getStatusColor }: ShippingColumnProps) => {
+export const ShippingColumn = ({ 
+  columnId, 
+  title, 
+  items, 
+  getStatusColor,
+  selectedItems,
+  onSelectItem 
+}: ShippingColumnProps) => {
   return (
     <div className="bg-white p-4 rounded-lg shadow-lg border-2 border-mint-100 transition-transform hover:shadow-xl">
       <h2 className="text-lg font-semibold mb-3 text-mint-700">{title}</h2>
@@ -26,7 +35,12 @@ export const ShippingColumn = ({ columnId, title, items, getStatusColor }: Shipp
             <ScrollArea className="h-[700px]">
               <div className="space-y-2 p-1">
                 {items.map((item, index) => (
-                  <Draggable key={item.id} draggableId={item.id} index={index}>
+                  <Draggable 
+                    key={item.id} 
+                    draggableId={item.id} 
+                    index={index}
+                    isDragDisabled={!selectedItems.includes(item.id) && selectedItems.length > 0}
+                  >
                     {(provided, snapshot) => (
                       <div
                         ref={provided.innerRef}
@@ -34,7 +48,12 @@ export const ShippingColumn = ({ columnId, title, items, getStatusColor }: Shipp
                         {...provided.dragHandleProps}
                         className={snapshot.isDragging ? "rotate-2 scale-105" : ""}
                       >
-                        <ShippingCard item={item} getStatusColor={getStatusColor} />
+                        <ShippingCard 
+                          item={item} 
+                          getStatusColor={getStatusColor}
+                          isSelected={selectedItems.includes(item.id)}
+                          onSelect={onSelectItem}
+                        />
                       </div>
                     )}
                   </Draggable>
