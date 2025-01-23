@@ -115,22 +115,39 @@ const Dashboard = () => {
           </Button>
         </div>
 
-        <div className="flex justify-center items-center mb-12 space-x-4">
-          <div className="flex items-center">
-            <div className="w-12 h-12 rounded-full bg-mint-500 flex items-center justify-center">
-              <Package className="text-white" />
+        <div className="flex justify-center items-center mb-12 relative">
+          {/* Flow Line */}
+          <div className="absolute top-1/2 left-1/2 w-[80%] h-0.5 bg-mint-300 -translate-x-1/2 -translate-y-1/2 -z-10" />
+          
+          {/* Process Icons with Connecting Lines */}
+          <div className="flex items-center justify-between w-full max-w-2xl relative z-10">
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-16 h-16 rounded-full bg-mint-500 flex items-center justify-center shadow-lg transform transition-transform hover:scale-110">
+                <Package className="text-white w-8 h-8" />
+              </div>
+              <span className="font-medium text-mint-700">Package Ready</span>
             </div>
-            <ArrowRight className="mx-4 text-gray-400" />
-          </div>
-          <div className="flex items-center">
-            <div className="w-12 h-12 rounded-full bg-mint-500 flex items-center justify-center">
-              <Truck className="text-white" />
+            
+            <div className="flex items-center">
+              <ArrowRight className="w-8 h-8 text-mint-400 animate-pulse" />
             </div>
-            <ArrowRight className="mx-4 text-gray-400" />
-          </div>
-          <div className="flex items-center">
-            <div className="w-12 h-12 rounded-full bg-mint-500 flex items-center justify-center">
-              <CheckCircle className="text-white" />
+            
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-16 h-16 rounded-full bg-mint-500 flex items-center justify-center shadow-lg transform transition-transform hover:scale-110">
+                <Truck className="text-white w-8 h-8" />
+              </div>
+              <span className="font-medium text-mint-700">In Transit</span>
+            </div>
+            
+            <div className="flex items-center">
+              <ArrowRight className="w-8 h-8 text-mint-400 animate-pulse" />
+            </div>
+            
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-16 h-16 rounded-full bg-mint-500 flex items-center justify-center shadow-lg transform transition-transform hover:scale-110">
+                <CheckCircle className="text-white w-8 h-8" />
+              </div>
+              <span className="font-medium text-mint-700">Delivered</span>
             </div>
           </div>
         </div>
@@ -138,14 +155,19 @@ const Dashboard = () => {
         <DragDropContext onDragEnd={onDragEnd}>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {Object.entries(columns).map(([columnId, column]) => (
-              <div key={columnId} className="bg-white p-4 rounded-lg shadow">
-                <h2 className="text-xl font-semibold mb-4">{column.title}</h2>
+              <div 
+                key={columnId} 
+                className="bg-white p-6 rounded-lg shadow-lg border-2 border-mint-100 transition-transform hover:shadow-xl"
+              >
+                <h2 className="text-xl font-semibold mb-4 text-mint-700">{column.title}</h2>
                 <Droppable droppableId={columnId}>
-                  {(provided) => (
+                  {(provided, snapshot) => (
                     <div
                       {...provided.droppableProps}
                       ref={provided.innerRef}
-                      className="space-y-4"
+                      className={`space-y-4 min-h-[200px] transition-colors ${
+                        snapshot.isDraggingOver ? "bg-mint-50" : ""
+                      }`}
                     >
                       {column.items.map((item, index) => (
                         <Draggable
@@ -153,15 +175,19 @@ const Dashboard = () => {
                           draggableId={item.id}
                           index={index}
                         >
-                          {(provided) => (
+                          {(provided, snapshot) => (
                             <Card
                               ref={provided.innerRef}
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
-                              className="p-4 hover:shadow-lg transition-shadow"
+                              className={`p-4 transition-all transform ${
+                                snapshot.isDragging
+                                  ? "shadow-2xl rotate-3 scale-105"
+                                  : "hover:shadow-lg hover:-translate-y-1"
+                              }`}
                             >
                               <div className="flex justify-between items-start mb-2">
-                                <Badge className={getStatusColor(item.status)}>
+                                <Badge className={`${getStatusColor(item.status)} animate-fade-in`}>
                                   {item.status}
                                 </Badge>
                                 <span className="text-sm text-gray-500">
@@ -169,7 +195,7 @@ const Dashboard = () => {
                                 </span>
                               </div>
                               <div className="space-y-2">
-                                <p className="font-medium">{item.jenisBarang}</p>
+                                <p className="font-medium text-mint-800">{item.jenisBarang}</p>
                                 <div className="text-sm text-gray-600">
                                   <p>From: {item.namaPengirim}</p>
                                   <p>To: {item.namaPenerima}</p>
