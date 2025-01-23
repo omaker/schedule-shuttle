@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ShippingColumn } from "@/components/ShippingColumn";
 import { Columns, ShippingItem } from "@/types/shipping";
-import { useToast } from "@/components/ui/use-toast";
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -22,8 +21,6 @@ const getStatusColor = (status: string) => {
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [columns, setColumns] = useState<Columns>({
     pending: {
       title: "Pending at Port",
@@ -126,16 +123,6 @@ const Dashboard = () => {
     },
   });
 
-  const handleSelectItem = (id: string) => {
-    setSelectedItems(prev => {
-      if (prev.includes(id)) {
-        return prev.filter(itemId => itemId !== id);
-      } else {
-        return [...prev, id];
-      }
-    });
-  };
-
   const onDragEnd = (result: any) => {
     if (!result.destination) return;
 
@@ -146,60 +133,23 @@ const Dashboard = () => {
       const destColumn = columns[destination.droppableId];
       const sourceItems = [...sourceColumn.items];
       const destItems = [...destColumn.items];
-
-      // If the dragged item is selected, move all selected items
-      if (selectedItems.includes(result.draggableId)) {
-        const itemsToMove = sourceItems.filter(item => selectedItems.includes(item.id));
-        const remainingItems = sourceItems.filter(item => !selectedItems.includes(item.id));
-
-        // Update items status and add to destination
-        const updatedItemsToMove = itemsToMove.map(item => ({
-          ...item,
-          status: destination.droppableId as ShippingItem["status"],
-        }));
-
-        // Insert all selected items at the destination index
-        destItems.splice(destination.index, 0, ...updatedItemsToMove);
-        
-        setColumns({
-          ...columns,
-          [source.droppableId]: {
-            ...sourceColumn,
-            items: remainingItems,
-          },
-          [destination.droppableId]: {
-            ...destColumn,
-            items: destItems,
-          },
-        });
-
-        toast({
-          title: "Items Moved",
-          description: `${itemsToMove.length} items have been moved to ${destColumn.title}`,
-        });
-
-        // Clear selection after moving
-        setSelectedItems([]);
-      } else {
-        // Single item drag logic
-        const [removed] = sourceItems.splice(source.index, 1);
-        destItems.splice(destination.index, 0, {
-          ...removed,
-          status: destination.droppableId as ShippingItem["status"],
-        });
-        
-        setColumns({
-          ...columns,
-          [source.droppableId]: {
-            ...sourceColumn,
-            items: sourceItems,
-          },
-          [destination.droppableId]: {
-            ...destColumn,
-            items: destItems,
-          },
-        });
-      }
+      const [removed] = sourceItems.splice(source.index, 1);
+      destItems.splice(destination.index, 0, {
+        ...removed,
+        status: destination.droppableId as ShippingItem["status"],
+      });
+      
+      setColumns({
+        ...columns,
+        [source.droppableId]: {
+          ...sourceColumn,
+          items: sourceItems,
+        },
+        [destination.droppableId]: {
+          ...destColumn,
+          items: destItems,
+        },
+      });
     } else {
       const column = columns[source.droppableId];
       const copiedItems = [...column.items];
@@ -273,8 +223,6 @@ const Dashboard = () => {
                 title={column.title}
                 items={column.items}
                 getStatusColor={getStatusColor}
-                selectedItems={selectedItems}
-                onSelectItem={handleSelectItem}
               />
             ))}
           </div>
