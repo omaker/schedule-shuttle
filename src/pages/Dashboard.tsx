@@ -1,23 +1,10 @@
 import { useState } from "react";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { DragDropContext } from "react-beautiful-dnd";
 import { ArrowRight, Package, Truck, CheckCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-
-interface ShippingItem {
-  id: string;
-  no: string;
-  tanggalPengiriman: string;
-  namaPengirim: string;
-  alamatPengirim: string;
-  namaPenerima: string;
-  alamatPenerima: string;
-  jenisBarang: string;
-  berat: string;
-  status: "pending" | "shipping" | "delivered";
-}
+import { ShippingColumn } from "@/components/ShippingColumn";
+import { Columns, ShippingItem } from "@/types/shipping";
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -34,7 +21,7 @@ const getStatusColor = (status: string) => {
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [columns, setColumns] = useState({
+  const [columns, setColumns] = useState<Columns>({
     pending: {
       title: "Pending",
       items: [
@@ -74,7 +61,7 @@ const Dashboard = () => {
           berat: "8",
           status: "pending",
         }
-      ] as ShippingItem[],
+      ],
     },
     shipping: {
       title: "Shipping",
@@ -103,7 +90,7 @@ const Dashboard = () => {
           berat: "2",
           status: "shipping",
         }
-      ] as ShippingItem[],
+      ],
     },
     delivered: {
       title: "Delivered",
@@ -144,7 +131,7 @@ const Dashboard = () => {
           berat: "7",
           status: "delivered",
         }
-      ] as ShippingItem[],
+      ],
     },
   });
 
@@ -154,8 +141,8 @@ const Dashboard = () => {
     const { source, destination } = result;
     
     if (source.droppableId !== destination.droppableId) {
-      const sourceColumn = columns[source.droppableId as keyof typeof columns];
-      const destColumn = columns[destination.droppableId as keyof typeof columns];
+      const sourceColumn = columns[source.droppableId];
+      const destColumn = columns[destination.droppableId];
       const sourceItems = [...sourceColumn.items];
       const destItems = [...destColumn.items];
       const [removed] = sourceItems.splice(source.index, 1);
@@ -176,7 +163,7 @@ const Dashboard = () => {
         },
       });
     } else {
-      const column = columns[source.droppableId as keyof typeof columns];
+      const column = columns[source.droppableId];
       const copiedItems = [...column.items];
       const [removed] = copiedItems.splice(source.index, 1);
       copiedItems.splice(destination.index, 0, removed);
@@ -202,10 +189,8 @@ const Dashboard = () => {
         </div>
 
         <div className="flex justify-center items-center mb-12 relative">
-          {/* Flow Line */}
           <div className="absolute top-1/2 left-1/2 w-[80%] h-0.5 bg-mint-300 -translate-x-1/2 -translate-y-1/2 -z-10" />
           
-          {/* Process Icons with Connecting Lines */}
           <div className="flex items-center justify-between w-full max-w-2xl relative z-10">
             <div className="flex flex-col items-center gap-2">
               <div className="w-16 h-16 rounded-full bg-mint-500 flex items-center justify-center shadow-lg transform transition-transform hover:scale-110">
@@ -241,62 +226,13 @@ const Dashboard = () => {
         <DragDropContext onDragEnd={onDragEnd}>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {Object.entries(columns).map(([columnId, column]) => (
-              <div 
-                key={columnId} 
-                className="bg-white p-6 rounded-lg shadow-lg border-2 border-mint-100 transition-transform hover:shadow-xl"
-              >
-                <h2 className="text-xl font-semibold mb-4 text-mint-700">{column.title}</h2>
-                <Droppable droppableId={columnId}>
-                  {(provided, snapshot) => (
-                    <div
-                      {...provided.droppableProps}
-                      ref={provided.innerRef}
-                      className={`space-y-4 min-h-[200px] transition-colors ${
-                        snapshot.isDraggingOver ? "bg-mint-50" : ""
-                      }`}
-                    >
-                      {column.items.map((item, index) => (
-                        <Draggable
-                          key={item.id}
-                          draggableId={item.id}
-                          index={index}
-                        >
-                          {(provided, snapshot) => (
-                            <Card
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                              className={`p-4 transition-all transform ${
-                                snapshot.isDragging
-                                  ? "shadow-2xl rotate-3 scale-105"
-                                  : "hover:shadow-lg hover:-translate-y-1"
-                              }`}
-                            >
-                              <div className="flex justify-between items-start mb-2">
-                                <Badge className={`${getStatusColor(item.status)} animate-fade-in`}>
-                                  {item.status}
-                                </Badge>
-                                <span className="text-sm text-gray-500">
-                                  #{item.no}
-                                </span>
-                              </div>
-                              <div className="space-y-2">
-                                <p className="font-medium text-mint-800">{item.jenisBarang}</p>
-                                <div className="text-sm text-gray-600">
-                                  <p>From: {item.namaPengirim}</p>
-                                  <p>To: {item.namaPenerima}</p>
-                                  <p>Weight: {item.berat} kg</p>
-                                </div>
-                              </div>
-                            </Card>
-                          )}
-                        </Draggable>
-                      ))}
-                      {provided.placeholder}
-                    </div>
-                  )}
-                </Droppable>
-              </div>
+              <ShippingColumn
+                key={columnId}
+                columnId={columnId}
+                title={column.title}
+                items={column.items}
+                getStatusColor={getStatusColor}
+              />
             ))}
           </div>
         </DragDropContext>
