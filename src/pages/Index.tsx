@@ -5,10 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import * as XLSX from "xlsx";
 import { useToast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
   const [shippingData, setShippingData] = useState<any[]>([]);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleDownloadTemplate = () => {
     // Create template data
@@ -52,14 +54,23 @@ const Index = () => {
           <p className="text-lg text-gray-600 mb-6">
             Upload Excel file untuk mengelola jadwal pengiriman Anda
           </p>
-          <Button
-            onClick={handleDownloadTemplate}
-            variant="outline"
-            className="mx-auto"
-          >
-            <Download className="mr-2" />
-            Download Template Excel
-          </Button>
+          <div className="space-x-4">
+            <Button
+              onClick={handleDownloadTemplate}
+              variant="outline"
+              className="mx-auto"
+            >
+              <Download className="mr-2" />
+              Download Template Excel
+            </Button>
+            <Button
+              onClick={() => navigate("/dashboard")}
+              variant="default"
+              className="mx-auto"
+            >
+              View Dashboard
+            </Button>
+          </div>
         </div>
 
         <div className="space-y-8">
