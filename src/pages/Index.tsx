@@ -1,9 +1,46 @@
 import { useState } from "react";
 import { FileUpload } from "@/components/FileUpload";
 import { ShippingTable } from "@/components/ShippingTable";
+import { Button } from "@/components/ui/button";
+import { Download } from "lucide-react";
+import * as XLSX from "xlsx";
+import { useToast } from "@/components/ui/use-toast";
 
 const Index = () => {
   const [shippingData, setShippingData] = useState<any[]>([]);
+  const { toast } = useToast();
+
+  const handleDownloadTemplate = () => {
+    // Create template data
+    const templateData = [
+      {
+        "No": "",
+        "Tanggal Pengiriman": "",
+        "Nama Pengirim": "",
+        "Alamat Pengirim": "",
+        "Nama Penerima": "",
+        "Alamat Penerima": "",
+        "Jenis Barang": "",
+        "Berat (kg)": "",
+        "Status": ""
+      }
+    ];
+
+    // Create workbook and worksheet
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(templateData);
+
+    // Add worksheet to workbook
+    XLSX.utils.book_append_sheet(wb, ws, "Template");
+
+    // Save file
+    XLSX.writeFile(wb, "shipping_schedule_template.xlsx");
+
+    toast({
+      title: "Template berhasil diunduh",
+      description: "Silakan isi template sesuai dengan format yang ada",
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -12,9 +49,17 @@ const Index = () => {
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
             Shipping Schedule Manager
           </h1>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-gray-600 mb-6">
             Upload Excel file untuk mengelola jadwal pengiriman Anda
           </p>
+          <Button
+            onClick={handleDownloadTemplate}
+            variant="outline"
+            className="mx-auto"
+          >
+            <Download className="mr-2" />
+            Download Template Excel
+          </Button>
         </div>
 
         <div className="space-y-8">
