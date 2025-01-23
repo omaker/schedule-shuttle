@@ -115,14 +115,23 @@ export const ShippingColumn = ({
                         ref={provided.innerRef}
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
-                        className={`shipping-card ${snapshot.isDragging ? "rotate-2 scale-105" : ""}`}
+                        className={`shipping-card ${
+                          selectedItems.includes(item.id) && snapshot.isDragging 
+                            ? "rotate-2 scale-105 shadow-lg" 
+                            : selectedItems.includes(item.id) && selectedItems.some(id => 
+                                items.find(i => i.id === id)?.status === item.status && 
+                                document.querySelector(`[data-rbd-draggable-id="${id}"]`)?.getAttribute('aria-grabbed') === 'true'
+                              )
+                            ? "rotate-2 scale-105 shadow-lg" 
+                            : ""
+                        }`}
                         data-item-id={item.id}
                       >
                         <ShippingCard 
                           item={item} 
                           getStatusColor={getStatusColor}
                           isSelected={selectedItems.includes(item.id)}
-                          onSelect={() => {}} // We don't need checkbox selection anymore
+                          onSelect={() => {}}
                         />
                       </div>
                     )}
