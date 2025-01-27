@@ -9,10 +9,7 @@ interface ActionButtonsProps {
 
 export const ActionButtons = ({ savedInDb, onSave, rowData }: ActionButtonsProps) => {
   return (
-    <div className="flex flex-col items-start space-y-2 p-2 bg-white/95 backdrop-blur-sm">
-      <div className="text-xs text-gray-500 font-medium truncate max-w-[200px]">
-        {rowData["Vessel"] || "No Vessel"}
-      </div>
+    <div className="flex items-center justify-center p-2 bg-white/95 backdrop-blur-sm h-[52px]">
       <Button
         variant={savedInDb ? "outline" : "default"}
         size="sm"
