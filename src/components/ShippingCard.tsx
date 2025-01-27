@@ -19,13 +19,17 @@ export const ShippingCard = ({ item, getStatusColor }: ShippingCardProps) => {
   useEffect(() => {
     const checkIfExists = async () => {
       try {
+        console.log("Checking existence for excel_id:", item.no);
         const { data, error } = await supabase
           .from('shipping_schedules')
           .select()
           .eq('excel_id', item.no)
           .maybeSingle();
 
-        if (error) throw error;
+        if (error) {
+          console.error('Error checking data:', error);
+          throw error;
+        }
         setExists(!!data);
       } catch (error) {
         console.error('Error checking data:', error);
@@ -43,8 +47,8 @@ export const ShippingCard = ({ item, getStatusColor }: ShippingCardProps) => {
           excel_id: item.no,
           product: item.jenisBarang,
           loading_status: item.status,
-          plan_qty: item.berat,
-          laycan_start: item.tanggalPengiriman,
+          plan_qty: Number(item.berat),
+          laycan_start: Number(item.tanggalPengiriman),
           company: item.namaPengirim,
           terminal: item.alamatPengirim,
           country: item.alamatPenerima
@@ -74,8 +78,8 @@ export const ShippingCard = ({ item, getStatusColor }: ShippingCardProps) => {
         .update({
           product: item.jenisBarang,
           loading_status: item.status,
-          plan_qty: item.berat,
-          laycan_start: item.tanggalPengiriman,
+          plan_qty: Number(item.berat),
+          laycan_start: Number(item.tanggalPengiriman),
           company: item.namaPengirim,
           terminal: item.alamatPengirim,
           country: item.alamatPenerima
