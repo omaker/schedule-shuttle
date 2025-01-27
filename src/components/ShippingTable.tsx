@@ -2,11 +2,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import { Search, Save } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { useState, useEffect } from "react";
+import { Search, Save, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Database } from "@/integrations/supabase/types";
+import { Badge } from "@/components/ui/badge";
 
 type ShippingSchedule = Database['public']['Tables']['shipping_schedules']['Insert'];
 
@@ -16,7 +17,39 @@ interface ShippingTableProps {
 
 export const ShippingTable = ({ data }: ShippingTableProps) => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [dbData, setDbData] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+
+  // Fetch data from Supabase on component mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { data: schedules, error } = await supabase
+          .from('shipping_schedules')
+          .select('*');
+
+        if (error) {
+          console.error("Error fetching data:", error);
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Failed to fetch shipping schedules",
+          });
+          return;
+        }
+
+        setDbData(schedules);
+      } catch (error) {
+        console.error("Error:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [toast]);
+
   const headers = [
     "EXCEL ID", "Year", "Month", "Fin Month", "Product", "Laycan Status", "First ETA", "Vessel", "Company",
     "Laycan Start", "Laycan Stop", "ETA", "Commence", "ATC", "Terminal", "L/R", "Dem Rate", "Plan Qty",
@@ -43,9 +76,21 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
     )
   );
 
+  const getStatusColor = (status: string) => {
+    switch (status?.toLowerCase()) {
+      case 'complete':
+        return 'bg-green-100 text-green-800';
+      case 'in progress':
+        return 'bg-blue-100 text-blue-800';
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
   const handleSaveRow = async (rowData: any) => {
     try {
-      // First check if we have an authenticated session
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError || !sessionData.session) {
@@ -62,7 +107,7 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
 
       // Map the row data to match the database schema
       const mappedData: ShippingSchedule = {
-        excel_id: rowData["EXCEL ID"], // Required field
+        excel_id: rowData["EXCEL ID"],
         year: rowData["Year"] ? Number(rowData["Year"]) : null,
         month: rowData["Month"] ? Number(rowData["Month"]) : null,
         fin_month: rowData["Fin Month"] ? Number(rowData["Fin Month"]) : null,
@@ -169,6 +214,14 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-mint-600" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       {/* Search Bar */}
@@ -181,6 +234,33 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
           className="pl-10 max-w-sm"
         />
       </div>
+
+      {/* Database Data Display */}
+      {dbData.length > 0 && (
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold mb-4">Existing Shipping Schedules</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {dbData.map((item, index) => (
+              <div key={index} className="p-4 border rounded-lg bg-white shadow-sm">
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <p className="font-medium">{item.vessel || 'No Vessel Name'}</p>
+                    <p className="text-sm text-gray-600">{item.company || 'No Company'}</p>
+                  </div>
+                  <Badge className={getStatusColor(item.loading_status)}>
+                    {item.loading_status || 'No Status'}
+                  </Badge>
+                </div>
+                <div className="text-sm">
+                  <p><span className="font-medium">Product:</span> {item.product || '-'}</p>
+                  <p><span className="font-medium">Quantity:</span> {item.plan_qty || '-'}</p>
+                  <p><span className="font-medium">Terminal:</span> {item.terminal || '-'}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Table Container */}
       <div className="rounded-lg border bg-white shadow-sm">
