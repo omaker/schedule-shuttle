@@ -45,6 +45,19 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
 
   const handleSaveRow = async (rowData: any) => {
     try {
+      // First check if we have an authenticated session
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !sessionData.session) {
+        console.error("Authentication error:", sessionError);
+        toast({
+          variant: "destructive",
+          title: "Authentication Error",
+          description: "Please log in to save data",
+        });
+        return;
+      }
+
       console.log("Saving row data:", rowData);
 
       // Map the row data to match the database schema
