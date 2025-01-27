@@ -155,20 +155,23 @@ export const FileUpload = ({ onDataReceived }: FileUploadProps) => {
             return newRow;
           });
 
-          if (mappedData.length === 0) {
+          // Filter out entries without EXCEL ID
+          const filteredData = mappedData.filter(row => row["EXCEL ID"] && row["EXCEL ID"].toString().trim() !== "");
+
+          if (filteredData.length === 0) {
             toast({
               variant: "destructive",
               title: "Error",
-              description: "File Excel kosong atau tidak memiliki data yang valid",
+              description: "Tidak ada data dengan EXCEL ID yang valid",
             });
             return;
           }
 
-          console.log("Mapped data:", mappedData); // Debug log
-          onDataReceived(mappedData);
+          console.log("Filtered data:", filteredData); // Debug log
+          onDataReceived(filteredData);
           toast({
             title: "File berhasil diupload",
-            description: `${mappedData.length} data berhasil diimport`,
+            description: `${filteredData.length} data berhasil diimport`,
           });
         } catch (error) {
           console.error("Error processing file:", error);
