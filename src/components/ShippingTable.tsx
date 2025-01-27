@@ -273,7 +273,7 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
 
       <div className="flex gap-4">
         <div className="w-[220px]">
-          <div className="bg-white rounded-t-md border-x border-t px-4 py-4">
+          <div className="bg-white rounded-t-md border-x border-t h-12 flex items-center px-4">
             <h3 className="text-sm font-medium text-gray-900">Action</h3>
           </div>
           <div className="bg-white/95 rounded-b-md border h-[600px] overflow-y-auto">
@@ -296,7 +296,7 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
                   {headers.map((header, index) => (
                     <TableHead 
                       key={index}
-                      className="min-w-[150px] bg-white py-4 text-left text-sm font-medium text-gray-900 hover:bg-gray-50"
+                      className="min-w-[150px] bg-white h-12 text-left text-sm font-medium text-gray-900 hover:bg-gray-50"
                     >
                       {header}
                     </TableHead>
