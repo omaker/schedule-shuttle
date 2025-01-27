@@ -255,7 +255,7 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
   };
 
   const renderActionButtons = (row: any, savedInDb: boolean) => (
-    <div className="fixed right-8 top-1/2 transform -translate-y-1/2 z-50 flex flex-col gap-2">
+    <div className="fixed right-8 z-50 flex flex-col gap-2 bg-white p-2 rounded-lg shadow-lg border border-gray-100">
       <Tooltip>
         <TooltipTrigger>
           {savedInDb ? (
@@ -358,7 +358,9 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
                             : (row[header] || '-')}
                         </TableCell>
                       ))}
-                      {renderActionButtons(row, savedInDb)}
+                      <div className="absolute right-8 top-1/2 transform -translate-y-1/2">
+                        {renderActionButtons(row, savedInDb)}
+                      </div>
                     </TableRow>
                   );
                 })}
