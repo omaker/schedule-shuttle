@@ -1,14 +1,13 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
-import { Search, Save, Loader2, Check, X, RefreshCw } from "lucide-react";
+import { Search, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Database } from "@/integrations/supabase/types";
 import { Badge } from "@/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { ActionButtons } from "./ActionButtons";
 
 type ShippingSchedule = Database['public']['Tables']['shipping_schedules']['Insert'];
 
@@ -20,6 +19,7 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [dbData, setDbData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedRow, setSelectedRow] = useState<any | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -273,105 +273,57 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
       </div>
 
       <div className="rounded-lg border bg-white shadow-sm">
+        {selectedRow && (
+          <ActionButtons
+            savedInDb={isRowInDatabase(selectedRow)}
+            onSave={() => handleSaveRow(selectedRow)}
+          />
+        )}
         <ScrollArea className="h-[600px] rounded-md border">
-          <div className="relative">
-            <Table>
-              <TableHeader className="sticky top-0 z-10 bg-white shadow-sm">
-                <TableRow>
-                  <TableHead className="sticky left-0 z-20 bg-white min-w-[180px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
-                    Status & Actions
+          <Table>
+            <TableHeader className="sticky top-0 z-10 bg-white shadow-sm">
+              <TableRow>
+                {headers.map((header, index) => (
+                  <TableHead 
+                    key={index}
+                    className="min-w-[150px] bg-white py-4 text-left text-sm font-medium text-gray-900 hover:bg-gray-50"
+                  >
+                    {header}
                   </TableHead>
-                  {headers.map((header, index) => (
-                    <TableHead 
-                      key={index}
-                      className="min-w-[150px] bg-white py-4 text-left text-sm font-medium text-gray-900 hover:bg-gray-50"
-                    >
-                      {header}
-                    </TableHead>
-                  ))}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredData.map((row, rowIndex) => {
-                  const savedInDb = isRowInDatabase(row);
-                  return (
-                    <TableRow 
-                      key={rowIndex}
-                      className="hover:bg-gray-50 transition-colors group relative"
-                    >
-                      <TableCell className="sticky left-0 z-10 bg-transparent p-2">
-                        <div className="absolute -left-2 top-1/2 -translate-y-1/2 transform transition-all duration-200 group-hover:translate-x-2">
-                          <div className="flex items-center gap-2 rounded-lg bg-white/95 p-2 shadow-lg backdrop-blur-sm ring-1 ring-black/5">
-                            <Tooltip>
-                              <TooltipTrigger>
-                                {savedInDb ? (
-                                  <Badge variant="outline" className="bg-green-50 border-green-200">
-                                    <Check className="h-4 w-4 text-green-500 mr-1" />
-                                    Saved
-                                  </Badge>
-                                ) : (
-                                  <Badge variant="outline" className="bg-yellow-50 border-yellow-200">
-                                    <X className="h-4 w-4 text-yellow-500 mr-1" />
-                                    Not Saved
-                                  </Badge>
-                                )}
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                {savedInDb ? 'Click Update to modify data' : 'Click Save to store in database'}
-                              </TooltipContent>
-                            </Tooltip>
-                            <Button
-                              variant={savedInDb ? "outline" : "default"}
-                              size="sm"
-                              onClick={() => handleSaveRow(row)}
-                              className={`
-                                transition-all duration-200 shadow-sm hover:shadow-md
-                                ${savedInDb 
-                                  ? 'bg-white hover:bg-gray-50 text-gray-700 border-gray-200' 
-                                  : 'bg-mint-500 hover:bg-mint-600 text-white'}
-                              `}
-                            >
-                              {savedInDb ? (
-                                <>
-                                  <RefreshCw className="h-4 w-4 mr-1" />
-                                  Update
-                                </>
-                              ) : (
-                                <>
-                                  <Save className="h-4 w-4 mr-1" />
-                                  Save
-                                </>
-                              )}
-                            </Button>
-                          </div>
-                        </div>
+                ))}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredData.map((row, rowIndex) => (
+                <TableRow 
+                  key={rowIndex}
+                  className="hover:bg-gray-50 transition-colors cursor-pointer"
+                  onClick={() => setSelectedRow(row)}
+                >
+                  {headers.map((header, colIndex) => {
+                    const value = row[header];
+                    const isStatusColumn = [
+                      'Laycan Status',
+                      'LC&CSA STATUS',
+                      'Loading Status',
+                      'Sales Status'
+                    ].includes(header);
+                    
+                    return (
+                      <TableCell 
+                        key={`${rowIndex}-${colIndex}`}
+                        className={`whitespace-nowrap py-4 px-4 text-sm ${
+                          !isStatusColumn && !isNaN(value) && value !== "" ? 'text-right font-mono' : 'text-left'
+                        }`}
+                      >
+                        {isStatusColumn ? renderStatusCell(value) : (value || '-')}
                       </TableCell>
-                      {headers.map((header, colIndex) => {
-                        const value = row[header];
-                        const isStatusColumn = [
-                          'Laycan Status',
-                          'LC&CSA STATUS',
-                          'Loading Status',
-                          'Sales Status'
-                        ].includes(header);
-                        
-                        return (
-                          <TableCell 
-                            key={`${rowIndex}-${colIndex}`}
-                            className={`whitespace-nowrap py-4 px-4 text-sm ${
-                              !isStatusColumn && !isNaN(value) && value !== "" ? 'text-right font-mono' : 'text-left'
-                            }`}
-                          >
-                            {isStatusColumn ? renderStatusCell(value) : (value || '-')}
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </div>
+                    );
+                  })}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
           <ScrollBar orientation="horizontal" />
         </ScrollArea>
       </div>
