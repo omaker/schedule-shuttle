@@ -273,19 +273,16 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
 
       <div className="flex gap-4">
         <div className="w-[220px] bg-white/95 rounded-md border">
-          <ScrollArea className="h-[600px]">
-            <div className="p-2 space-y-2">
-              {filteredData.map((row, index) => (
-                <ActionButtons
-                  key={index}
-                  savedInDb={isRowInDatabase(row)}
-                  onSave={() => handleSaveRow(row)}
-                  rowData={row}
-                />
-              ))}
-            </div>
-            <ScrollBar orientation="vertical" />
-          </ScrollArea>
+          <div className="h-[600px] overflow-hidden">
+            {filteredData.map((row, index) => (
+              <ActionButtons
+                key={index}
+                savedInDb={isRowInDatabase(row)}
+                onSave={() => handleSaveRow(row)}
+                rowData={row}
+              />
+            ))}
+          </div>
         </div>
 
         <div className="rounded-lg border bg-white shadow-sm flex-1">

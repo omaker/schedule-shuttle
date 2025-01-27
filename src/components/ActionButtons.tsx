@@ -11,7 +11,7 @@ interface ActionButtonsProps {
 
 export const ActionButtons = ({ savedInDb, onSave, rowData }: ActionButtonsProps) => {
   return (
-    <div className="flex flex-col items-start space-y-2 p-2 bg-white/95 rounded-lg shadow-sm backdrop-blur-sm ring-1 ring-black/5">
+    <div className="flex flex-col items-start space-y-2 p-2 bg-white/95 backdrop-blur-sm ring-1 ring-black/5">
       <div className="text-xs text-gray-500 font-medium truncate max-w-[200px]">
         {rowData["Vessel"] || "No Vessel"}
       </div>
