@@ -78,7 +78,7 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
   }
 
   const mapRowToShippingItem = (row: any) => ({
-    id: row["EXCEL ID"] || row.id || crypto.randomUUID(), // Add id field, fallback to random UUID if neither exists
+    id: row["EXCEL ID"] || row.id || crypto.randomUUID(),
     no: row["EXCEL ID"] || "",
     status: row["Loading Status"] || "Pending",
     jenisBarang: row["Product"] || "Unknown",
@@ -91,19 +91,19 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
   });
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 bg-gray-50 p-6 rounded-lg shadow-sm">
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
         <Input
           placeholder="Search in cards..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10 max-w-sm"
+          className="pl-10 max-w-sm bg-white border-gray-200"
         />
       </div>
 
-      <ScrollArea className="h-[600px]">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+      <ScrollArea className="h-[600px] bg-transparent">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
           {filteredData.map((row, index) => (
             <ShippingCard
               key={index}
@@ -115,7 +115,7 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
         <ScrollBar orientation="vertical" />
       </ScrollArea>
 
-      <div className="text-sm text-gray-500">
+      <div className="text-sm text-gray-500 bg-white p-3 rounded-md shadow-sm">
         Showing {filteredData.length} of {data.length} entries
       </div>
     </div>

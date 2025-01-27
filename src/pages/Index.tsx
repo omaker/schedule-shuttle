@@ -146,7 +146,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-mint-50 to-mint-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12 animate-fade-in">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
@@ -159,7 +159,7 @@ const Index = () => {
             <Button
               onClick={handleDownloadTemplate}
               variant="outline"
-              className="mx-auto"
+              className="mx-auto bg-white hover:bg-gray-50"
             >
               <Download className="mr-2" />
               Download Template Excel
@@ -167,7 +167,7 @@ const Index = () => {
             <Button
               onClick={() => navigate("/dashboard")}
               variant="default"
-              className="mx-auto"
+              className="mx-auto bg-mint-600 hover:bg-mint-700 text-white"
             >
               View Dashboard
             </Button>
