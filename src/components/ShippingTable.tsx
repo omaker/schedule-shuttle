@@ -81,13 +81,26 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
       case 'complete':
         return 'bg-green-100 text-green-800';
       case 'in progress':
+      case 'otw': // Added OTW status
         return 'bg-blue-100 text-blue-800';
       case 'pending':
+      case 'not ok': // Added NOT OK status
         return 'bg-yellow-100 text-yellow-800';
+      case 'ok': // Added OK status
+        return 'bg-green-100 text-green-800';
+      case 'unsold': // Added Unsold status
+        return 'bg-red-100 text-red-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
   };
+
+  // Function to render status cell with badge
+  const renderStatusCell = (value: string) => (
+    <Badge className={getStatusColor(value)}>
+      {value || 'No Status'}
+    </Badge>
+  );
 
   const handleSaveRow = async (rowData: any) => {
     try {
@@ -251,10 +264,18 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
                     {item.loading_status || 'No Status'}
                   </Badge>
                 </div>
-                <div className="text-sm">
+                <div className="text-sm space-y-1">
                   <p><span className="font-medium">Product:</span> {item.product || '-'}</p>
                   <p><span className="font-medium">Quantity:</span> {item.plan_qty || '-'}</p>
                   <p><span className="font-medium">Terminal:</span> {item.terminal || '-'}</p>
+                  <div className="flex gap-2 mt-2">
+                    <Badge className={getStatusColor(item.laycan_status)}>
+                      Laycan: {item.laycan_status || '-'}
+                    </Badge>
+                    <Badge className={getStatusColor(item.sales_status)}>
+                      Sales: {item.sales_status || '-'}
+                    </Badge>
+                  </div>
                 </div>
               </div>
             ))}
@@ -301,16 +322,21 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
                     </TableCell>
                     {headers.map((header, colIndex) => {
                       const value = row[header];
-                      const isNumeric = !isNaN(value) && value !== "";
+                      const isStatusColumn = [
+                        'Laycan Status',
+                        'LC&CSA STATUS',
+                        'Loading Status',
+                        'Sales Status'
+                      ].includes(header);
                       
                       return (
                         <TableCell 
                           key={`${rowIndex}-${colIndex}`}
                           className={`whitespace-nowrap py-4 px-4 text-sm ${
-                            isNumeric ? 'text-right font-mono' : 'text-left'
+                            !isStatusColumn && !isNaN(value) && value !== "" ? 'text-right font-mono' : 'text-left'
                           }`}
                         >
-                          {value || '-'}
+                          {isStatusColumn ? renderStatusCell(value) : (value || '-')}
                         </TableCell>
                       );
                     })}
