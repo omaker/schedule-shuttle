@@ -3,7 +3,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
-import { Search, Save, Loader2, Check, X } from "lucide-react";
+import { Search, Save, Loader2, Check, X, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Database } from "@/integrations/supabase/types";
@@ -22,7 +22,6 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
-  // Fetch data from Supabase on component mount
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -70,14 +69,12 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
     "Revenue Non-Capped", "Incremental Revenue", "Net BLU Expense/(Income)"
   ];
 
-  // Filter data based on search term
   const filteredData = data.filter(row => 
     Object.values(row).some(value => 
       value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
     )
   );
 
-  // Check if a row exists in the database
   const isRowInDatabase = (row: any) => {
     return dbData.some(dbRow => dbRow.excel_id === row["EXCEL ID"]);
   };
@@ -121,9 +118,8 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
         return;
       }
 
-      console.log("Saving row data:", rowData);
+      console.log("Saving/Updating row data:", rowData);
 
-      // Map the row data to match the database schema
       const mappedData: ShippingSchedule = {
         excel_id: rowData["EXCEL ID"],
         year: rowData["Year"] ? Number(rowData["Year"]) : null,
@@ -204,30 +200,54 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
 
       console.log("Mapped data:", mappedData);
 
-      const { error } = await supabase
-        .from('shipping_schedules')
-        .insert(mappedData);
+      const existingRow = dbData.find(item => item.excel_id === mappedData.excel_id);
+      let result;
+
+      if (existingRow) {
+        result = await supabase
+          .from('shipping_schedules')
+          .update(mappedData)
+          .eq('excel_id', mappedData.excel_id);
+        
+        console.log("Updating existing record:", result);
+      } else {
+        result = await supabase
+          .from('shipping_schedules')
+          .insert(mappedData);
+        
+        console.log("Inserting new record:", result);
+      }
+
+      const { error } = result;
 
       if (error) {
-        console.error("Error inserting data:", error);
+        console.error("Error saving/updating data:", error);
         toast({
           variant: "destructive",
           title: "Error",
-          description: "Failed to save data",
+          description: existingRow ? "Failed to update data" : "Failed to save data",
         });
         return;
       }
 
+      const { data: updatedData } = await supabase
+        .from('shipping_schedules')
+        .select('*');
+      
+      if (updatedData) {
+        setDbData(updatedData);
+      }
+
       toast({
         title: "Success",
-        description: "Data saved successfully",
+        description: existingRow ? "Data updated successfully" : "Data saved successfully",
       });
     } catch (error) {
-      console.error("Error saving data:", error);
+      console.error("Error saving/updating data:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to save data",
+        description: "Failed to save/update data",
       });
     }
   };
@@ -242,7 +262,6 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
 
   return (
     <div className="space-y-4">
-      {/* Search Bar */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
         <Input
@@ -253,7 +272,6 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
         />
       </div>
 
-      {/* Database Data Display */}
       {dbData.length > 0 && (
         <div className="mb-8">
           <h3 className="text-lg font-semibold mb-4">Existing Shipping Schedules</h3>
@@ -288,7 +306,6 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
         </div>
       )}
 
-      {/* Table Container */}
       <div className="rounded-lg border bg-white shadow-sm">
         <ScrollArea className="h-[600px] rounded-md border">
           <div className="relative">
@@ -333,19 +350,26 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
                               )}
                             </TooltipTrigger>
                             <TooltipContent>
-                              {savedInDb ? 'Data is saved in database' : 'Click Save to store in database'}
+                              {savedInDb ? 'Click Update to modify data' : 'Click Save to store in database'}
                             </TooltipContent>
                           </Tooltip>
-                          {!savedInDb && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleSaveRow(row)}
-                            >
-                              <Save className="h-4 w-4 mr-1" />
-                              Save
-                            </Button>
-                          )}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleSaveRow(row)}
+                          >
+                            {savedInDb ? (
+                              <>
+                                <RefreshCw className="h-4 w-4 mr-1" />
+                                Update
+                              </>
+                            ) : (
+                              <>
+                                <Save className="h-4 w-4 mr-1" />
+                                Save
+                              </>
+                            )}
+                          </Button>
                         </div>
                       </TableCell>
                       {headers.map((header, colIndex) => {
@@ -378,7 +402,6 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
         </ScrollArea>
       </div>
 
-      {/* Table Info */}
       <div className="text-sm text-gray-500">
         Showing {filteredData.length} of {data.length} entries
       </div>
