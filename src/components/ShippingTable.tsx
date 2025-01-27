@@ -83,13 +83,13 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
     id: row["EXCEL ID"] || row.id || crypto.randomUUID(),
     no: row["EXCEL ID"] || "",
     status: row["Loading Status"] || "Pending",
-    jenisBarang: row["Product"] || "Unknown",
+    jenisBarang: row["Product"] || "Tidak ada data",
     berat: row["Plan Qty"] || 0,
     tanggalPengiriman: row["Laycan Start"] || "TBD",
-    namaPengirim: row["Company"] || "Unknown",
-    alamatPengirim: row["Terminal"] || "Unknown",
-    namaPenerima: row["Base Customer"] || "Unknown",
-    alamatPenerima: row["Country"] || "Unknown"
+    namaPengirim: row["Company"] || "Tidak ada data",
+    alamatPengirim: row["Terminal"] || "Tidak ada data",
+    namaPenerima: row["Base Customer"] || "Tidak ada data",
+    alamatPenerima: row["Country"] || "Tidak ada data"
   });
 
   return (
