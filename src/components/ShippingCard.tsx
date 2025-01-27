@@ -46,8 +46,9 @@ export const ShippingCard = ({ item, getStatusColor }: ShippingCardProps) => {
     try {
       const { error } = await supabase
         .from('shipping_schedules')
-        .insert([{ 
+        .insert({
           id: item.id,
+          excel_id: item.no,
           product: item.jenisBarang,
           loading_status: item.status,
           plan_qty: item.berat,
@@ -55,7 +56,7 @@ export const ShippingCard = ({ item, getStatusColor }: ShippingCardProps) => {
           company: item.namaPengirim,
           terminal: item.alamatPengirim,
           country: item.alamatPenerima
-        }]);
+        });
 
       if (error) throw error;
 
@@ -101,15 +102,16 @@ export const ShippingCard = ({ item, getStatusColor }: ShippingCardProps) => {
   return (
     <HoverCard>
       <HoverCardTrigger asChild>
-        <Card className="p-4 transition-all transform hover:shadow-md hover:-translate-y-0.5 bg-gradient-to-br from-slate-50 to-slate-100 relative min-w-[300px]">
-          <div className="absolute top-4 right-4 flex gap-2">
+        <Card className="p-6 transition-all transform hover:shadow-md hover:-translate-y-0.5 bg-gradient-to-br from-slate-50 to-slate-100 relative min-w-[350px]">
+          <div className="absolute top-6 right-6">
             {!exists ? (
               <button
                 onClick={(e) => {
                   e.preventDefault();
+                  e.stopPropagation();
                   handleSave();
                 }}
-                className="p-1.5 hover:bg-mint-100 rounded-full transition-colors"
+                className="p-2 hover:bg-mint-100 rounded-full transition-colors"
                 title="Save"
               >
                 <Save className="w-5 h-5 text-mint-600" />
@@ -118,9 +120,10 @@ export const ShippingCard = ({ item, getStatusColor }: ShippingCardProps) => {
               <button
                 onClick={(e) => {
                   e.preventDefault();
+                  e.stopPropagation();
                   handleUpdate();
                 }}
-                className="p-1.5 hover:bg-mint-100 rounded-full transition-colors"
+                className="p-2 hover:bg-mint-100 rounded-full transition-colors"
                 title="Update"
               >
                 <RefreshCw className="w-5 h-5 text-mint-600" />
@@ -128,28 +131,33 @@ export const ShippingCard = ({ item, getStatusColor }: ShippingCardProps) => {
             )}
           </div>
 
-          <div className="flex items-center justify-between gap-4 mb-3">
-            <div className="flex items-center gap-2">
-              <Badge className={`${getStatusColor(item.status)} animate-fade-in flex items-center gap-1.5 text-sm px-3 py-1`}>
-                <Ship className="w-4 h-4" />
-                {item.status}
-              </Badge>
-              <span className="text-sm text-gray-500 font-mono">#{item.no}</span>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Badge className={`${getStatusColor(item.status)} animate-fade-in flex items-center gap-1.5 text-sm px-3 py-1`}>
+                  <Ship className="w-4 h-4" />
+                  {item.status}
+                </Badge>
+                <span className="text-sm text-gray-500 font-mono">#{item.no}</span>
+              </div>
             </div>
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <Calendar className="w-4 h-4 text-mint-600" />
-              {item.tanggalPengiriman}
-            </div>
-          </div>
-          
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2 text-mint-800">
-              <Anchor className="w-4 h-4" />
-              <p className="text-base font-medium">{item.jenisBarang}</p>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Weight className="w-4 h-4 text-mint-600" />
-              <p>{item.berat} ton</p>
+            
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-mint-800">
+                  <Anchor className="w-4 h-4" />
+                  <p className="text-base font-medium">{item.jenisBarang}</p>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <Weight className="w-4 h-4 text-mint-600" />
+                  <p>{item.berat} ton</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-2 text-sm text-gray-500">
+                <Calendar className="w-4 h-4 text-mint-600" />
+                {item.tanggalPengiriman}
+              </div>
             </div>
           </div>
         </Card>
