@@ -278,7 +278,7 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
             <Table>
               <TableHeader className="sticky top-0 z-10 bg-white shadow-sm">
                 <TableRow>
-                  <TableHead className="sticky left-0 z-20 bg-white min-w-[150px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
+                  <TableHead className="sticky left-0 z-20 bg-white min-w-[180px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
                     Status & Actions
                   </TableHead>
                   {headers.map((header, index) => (
@@ -299,8 +299,8 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
                       key={rowIndex}
                       className="hover:bg-gray-50 transition-colors"
                     >
-                      <TableCell className="sticky left-0 z-10 bg-white shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
-                        <div className="flex items-center gap-2">
+                      <TableCell className="sticky left-0 z-10 bg-white shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] p-2">
+                        <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-lg p-2">
                           <Tooltip>
                             <TooltipTrigger>
                               {savedInDb ? (
@@ -320,9 +320,15 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
                             </TooltipContent>
                           </Tooltip>
                           <Button
-                            variant="outline"
+                            variant={savedInDb ? "outline" : "default"}
                             size="sm"
                             onClick={() => handleSaveRow(row)}
+                            className={`
+                              transition-all duration-200 shadow-sm hover:shadow-md
+                              ${savedInDb 
+                                ? 'bg-white hover:bg-gray-50 text-gray-700 border-gray-200' 
+                                : 'bg-mint-500 hover:bg-mint-600 text-white'}
+                            `}
                           >
                             {savedInDb ? (
                               <>
