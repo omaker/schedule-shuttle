@@ -272,40 +272,6 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
         />
       </div>
 
-      {dbData.length > 0 && (
-        <div className="mb-8">
-          <h3 className="text-lg font-semibold mb-4">Existing Shipping Schedules</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {dbData.map((item, index) => (
-              <div key={index} className="p-4 border rounded-lg bg-white shadow-sm">
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <p className="font-medium">{item.vessel || 'No Vessel Name'}</p>
-                    <p className="text-sm text-gray-600">{item.company || 'No Company'}</p>
-                  </div>
-                  <Badge className={getStatusColor(item.loading_status)}>
-                    {item.loading_status || 'No Status'}
-                  </Badge>
-                </div>
-                <div className="text-sm space-y-1">
-                  <p><span className="font-medium">Product:</span> {item.product || '-'}</p>
-                  <p><span className="font-medium">Quantity:</span> {item.plan_qty || '-'}</p>
-                  <p><span className="font-medium">Terminal:</span> {item.terminal || '-'}</p>
-                  <div className="flex gap-2 mt-2">
-                    <Badge className={getStatusColor(item.laycan_status)}>
-                      Laycan: {item.laycan_status || '-'}
-                    </Badge>
-                    <Badge className={getStatusColor(item.sales_status)}>
-                      Sales: {item.sales_status || '-'}
-                    </Badge>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
       <div className="rounded-lg border bg-white shadow-sm">
         <ScrollArea className="h-[600px] rounded-md border">
           <div className="relative">
