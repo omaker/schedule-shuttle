@@ -272,8 +272,11 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
       </div>
 
       <div className="flex gap-4">
-        <div className="w-[220px] bg-white/95 rounded-md border">
-          <div className="h-[600px] overflow-hidden">
+        <div className="w-[220px]">
+          <div className="bg-white rounded-t-md border-x border-t px-4 py-4">
+            <h3 className="text-sm font-medium text-gray-900">Action</h3>
+          </div>
+          <div className="bg-white/95 rounded-b-md border h-[600px] overflow-y-auto">
             {filteredData.map((row, index) => (
               <ActionButtons
                 key={index}
