@@ -3,7 +3,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect, useRef } from "react";
-import { Search, Save, Loader2, Check, X, RefreshCw } from "lucide-react";
+import { Search, Save, Loader2, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Database } from "@/integrations/supabase/types";
@@ -279,8 +279,8 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
             <Table>
               <TableHeader className="sticky top-0 z-10 bg-white">
                 <TableRow>
-                  <TableHead className="sticky left-0 z-20 bg-white w-[200px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
-                    Status & Actions
+                  <TableHead className="sticky left-0 z-20 bg-white w-[120px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
+                    Actions
                   </TableHead>
                   {headers.map((header, index) => (
                     <TableHead 
@@ -300,50 +300,30 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
                       key={rowIndex}
                       className="group hover:bg-gray-50 transition-colors relative"
                     >
-                      <TableCell className="sticky left-0 z-10 bg-white group-hover:bg-gray-50 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] w-[200px]">
-                        <div className="flex items-center gap-2 p-2">
-                          <Tooltip>
-                            <TooltipTrigger>
-                              {savedInDb ? (
-                                <Badge variant="outline" className="bg-green-50 border-green-200">
-                                  <Check className="h-4 w-4 text-green-500 mr-1" />
-                                  Saved
-                                </Badge>
-                              ) : (
-                                <Badge variant="outline" className="bg-yellow-50 border-yellow-200">
-                                  <X className="h-4 w-4 text-yellow-500 mr-1" />
-                                  Not Saved
-                                </Badge>
-                              )}
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              {savedInDb ? 'Click Update to modify data' : 'Click Save to store in database'}
-                            </TooltipContent>
-                          </Tooltip>
-                          <Button
-                            variant={savedInDb ? "outline" : "default"}
-                            size="sm"
-                            onClick={() => handleSaveRow(row)}
-                            className={`
-                              transition-all duration-200 shadow-sm hover:shadow-md
-                              ${savedInDb 
-                                ? 'bg-white hover:bg-gray-50 text-gray-700 border-gray-200' 
-                                : 'bg-mint-500 hover:bg-mint-600 text-white'}
-                            `}
-                          >
-                            {savedInDb ? (
-                              <>
-                                <RefreshCw className="h-4 w-4 mr-1" />
-                                Update
-                              </>
-                            ) : (
-                              <>
-                                <Save className="h-4 w-4 mr-1" />
-                                Save
-                              </>
-                            )}
-                          </Button>
-                        </div>
+                      <TableCell className="sticky left-0 z-10 bg-white group-hover:bg-gray-50 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] w-[120px]">
+                        <Button
+                          variant={savedInDb ? "outline" : "default"}
+                          size="sm"
+                          onClick={() => handleSaveRow(row)}
+                          className={`
+                            transition-all duration-200 shadow-sm hover:shadow-md w-full
+                            ${savedInDb 
+                              ? 'bg-white hover:bg-gray-50 text-gray-700 border-gray-200' 
+                              : 'bg-mint-500 hover:bg-mint-600 text-white'}
+                          `}
+                        >
+                          {savedInDb ? (
+                            <>
+                              <RefreshCw className="h-4 w-4 mr-1" />
+                              Update
+                            </>
+                          ) : (
+                            <>
+                              <Save className="h-4 w-4 mr-1" />
+                              Save
+                            </>
+                          )}
+                        </Button>
                       </TableCell>
                       {headers.map((header, colIndex) => {
                         const value = row[header];
