@@ -106,61 +106,73 @@ export const ShippingCard = ({ item, getStatusColor, view }: ShippingCardProps) 
         className="p-4 hover:bg-gray-50 transition-all border-l-4 border-l-mint-500 cursor-pointer animate-fade-in relative group" 
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Badge className={`${getStatusColor(item.status)} flex items-center gap-1.5`}>
-              <Ship className="w-3 h-3" />
-              {item.status}
-            </Badge>
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Badge className={`${getStatusColor(item.status)} flex items-center gap-1.5`}>
+                <Ship className="w-3 h-3" />
+                {item.status}
+              </Badge>
+              <span className="text-sm font-mono text-gray-500">#{item.no}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              {!exists ? (
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleSave();
+                  }}
+                  className="opacity-0 group-hover:opacity-100 transition-opacity px-2 py-1 rounded-md hover:bg-mint-50 text-mint-600 text-sm flex items-center gap-1"
+                >
+                  <Save className="w-4 h-4" />
+                  Save
+                </button>
+              ) : (
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleUpdate();
+                  }}
+                  className="opacity-0 group-hover:opacity-100 transition-opacity px-2 py-1 rounded-md hover:bg-mint-50 text-mint-600 text-sm flex items-center gap-1"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  Update
+                </button>
+              )}
+              {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
             <div className="flex items-center gap-2">
               <Package className="w-4 h-4 text-mint-600" />
               <span className="text-sm font-medium text-mint-800">{item.jenisBarang}</span>
             </div>
+            <div className="flex items-center gap-2 justify-end">
+              <Weight className="w-4 h-4 text-mint-600" />
+              <span className="text-sm text-gray-600">{item.berat} ton</span>
+            </div>
           </div>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-500">{item.berat} ton</span>
-            {!exists ? (
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleSave();
-                }}
-                className="opacity-0 group-hover:opacity-100 transition-opacity px-2 py-1 rounded-md hover:bg-mint-50 text-mint-600 text-sm flex items-center gap-1"
-              >
-                <Save className="w-4 h-4" />
-                Save
-              </button>
-            ) : (
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleUpdate();
-                }}
-                className="opacity-0 group-hover:opacity-100 transition-opacity px-2 py-1 rounded-md hover:bg-mint-50 text-mint-600 text-sm flex items-center gap-1"
-              >
-                <RefreshCw className="w-4 h-4" />
-                Update
-              </button>
-            )}
-            {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <Calendar className="w-4 h-4 text-mint-600" />
+            <span>{item.tanggalPengiriman}</span>
           </div>
         </div>
         
         {isExpanded && (
-          <div className="mt-4 space-y-2 text-sm text-gray-600">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="font-medium">From:</p>
-                <p>{item.namaPengirim}</p>
-                <p className="text-gray-500">{item.alamatPengirim}</p>
-              </div>
-              <div>
-                <p className="font-medium">To:</p>
-                <p>{item.namaPenerima}</p>
-                <p className="text-gray-500">{item.alamatPenerima}</p>
-              </div>
+          <div className="mt-4 pt-4 border-t border-gray-100 grid grid-cols-2 gap-6">
+            <div>
+              <p className="text-xs font-medium text-gray-500 mb-1">From:</p>
+              <p className="text-sm font-medium">{item.namaPengirim}</p>
+              <p className="text-sm text-gray-600">{item.alamatPengirim}</p>
+            </div>
+            <div>
+              <p className="text-xs font-medium text-gray-500 mb-1">To:</p>
+              <p className="text-sm font-medium">{item.namaPenerima}</p>
+              <p className="text-sm text-gray-600">{item.alamatPenerima}</p>
             </div>
           </div>
         )}
@@ -172,97 +184,71 @@ export const ShippingCard = ({ item, getStatusColor, view }: ShippingCardProps) 
     <HoverCard>
       <HoverCardTrigger asChild>
         <Card className="group p-6 transition-all hover:-translate-y-1 hover:shadow-lg bg-white relative animate-fade-in border-t-4 border-t-mint-500">
-          <div className="flex justify-between items-start mb-4">
-            <Badge className={`${getStatusColor(item.status)} flex items-center gap-1.5 text-sm px-3 py-1`}>
-              <Ship className="w-4 h-4" />
-              {item.status}
-            </Badge>
-            {!exists ? (
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleSave();
-                }}
-                className="opacity-0 group-hover:opacity-100 transition-opacity px-3 py-1.5 rounded-md hover:bg-mint-50 text-mint-600 text-sm flex items-center gap-1.5"
-              >
-                <Save className="w-4 h-4" />
-                Save
-              </button>
-            ) : (
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleUpdate();
-                }}
-                className="opacity-0 group-hover:opacity-100 transition-opacity px-3 py-1.5 rounded-md hover:bg-mint-50 text-mint-600 text-sm flex items-center gap-1.5"
-              >
-                <RefreshCw className="w-4 h-4" />
-                Update
-              </button>
-            )}
-          </div>
-
-          <div className="space-y-4">
+          <div className="grid gap-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-500 font-mono">#{item.no}</span>
+              <div className="flex items-center gap-3">
+                <Badge className={`${getStatusColor(item.status)} flex items-center gap-1.5`}>
+                  <Ship className="w-3 h-3" />
+                  {item.status}
+                </Badge>
+                <span className="text-sm font-mono text-gray-500">#{item.no}</span>
+              </div>
+              {!exists ? (
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleSave();
+                  }}
+                  className="opacity-0 group-hover:opacity-100 transition-opacity px-3 py-1.5 rounded-md hover:bg-mint-50 text-mint-600 text-sm flex items-center gap-1.5"
+                >
+                  <Save className="w-4 h-4" />
+                  Save
+                </button>
+              ) : (
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleUpdate();
+                  }}
+                  className="opacity-0 group-hover:opacity-100 transition-opacity px-3 py-1.5 rounded-md hover:bg-mint-50 text-mint-600 text-sm flex items-center gap-1.5"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  Update
+                </button>
+              )}
             </div>
-            
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-mint-800">
-                  <Package className="w-4 h-4 text-mint-600" />
-                  <p className="text-base font-medium truncate max-w-[200px]">{item.jenisBarang}</p>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <Weight className="w-4 h-4 text-mint-600" />
-                  <p>{item.berat} ton</p>
-                </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex items-center gap-2">
+                <Package className="w-4 h-4 text-mint-600" />
+                <span className="text-base font-medium text-mint-800">{item.jenisBarang}</span>
               </div>
-              
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <Calendar className="w-4 h-4 text-mint-600" />
-                {item.tanggalPengiriman}
+              <div className="flex items-center gap-2 justify-end">
+                <Weight className="w-4 h-4 text-mint-600" />
+                <span className="text-sm text-gray-600">{item.berat} ton</span>
               </div>
+            </div>
+
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <Calendar className="w-4 h-4 text-mint-600" />
+              <span>{item.tanggalPengiriman}</span>
             </div>
           </div>
         </Card>
       </HoverCardTrigger>
       <HoverCardContent className="w-80 p-4">
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <Badge className={`${getStatusColor(item.status)}`}>
-              <Ship className="w-4 h-4 mr-1" />
-              {item.status}
-            </Badge>
-            <span className="text-sm font-mono">#{item.no}</span>
-          </div>
-          
-          <div className="space-y-1">
-            <h4 className="font-semibold text-mint-800 flex items-center gap-2">
-              <Package className="w-4 h-4" />
-              {item.jenisBarang}
-            </h4>
-            <p className="text-sm flex items-center gap-2">
-              <Weight className="w-4 h-4 text-mint-600" />
-              {item.berat} ton
-            </p>
-            <p className="text-sm flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-mint-600" />
-              {item.tanggalPengiriman}
-            </p>
-          </div>
-
-          <div className="space-y-2 pt-2 border-t">
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-sm font-medium text-gray-500">From:</p>
-              <p className="text-sm">{item.namaPengirim}</p>
+              <p className="text-xs font-medium text-gray-500 mb-1">From:</p>
+              <p className="text-sm font-medium">{item.namaPengirim}</p>
               <p className="text-sm text-gray-600">{item.alamatPengirim}</p>
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-500">To:</p>
-              <p className="text-sm">{item.namaPenerima}</p>
+              <p className="text-xs font-medium text-gray-500 mb-1">To:</p>
+              <p className="text-sm font-medium">{item.namaPenerima}</p>
               <p className="text-sm text-gray-600">{item.alamatPenerima}</p>
             </div>
           </div>
