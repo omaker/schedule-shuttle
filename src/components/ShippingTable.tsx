@@ -274,113 +274,103 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
       </div>
 
       <div className="rounded-lg border bg-white shadow-sm">
-        <div className="relative">
-          <ScrollArea className="h-[600px] rounded-md">
-            <div className="relative">
-              <Table>
-                <TableHeader className="sticky top-0 z-20 bg-white">
-                  <TableRow>
+        <ScrollArea className="h-[600px] rounded-md">
+          <div className="relative">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead 
+                    className="sticky left-0 z-30 bg-white w-[200px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]"
+                    style={{ position: 'sticky', left: 0 }}
+                  >
+                    Status & Actions
+                  </TableHead>
+                  {headers.map((header, index) => (
                     <TableHead 
-                      className="sticky left-0 z-30 bg-white w-[200px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]"
-                      style={{ position: 'sticky', left: 0 }}
+                      key={index}
+                      className="min-w-[150px] bg-white py-4 text-left text-sm font-medium text-gray-900"
                     >
-                      Status & Actions
+                      {header}
                     </TableHead>
-                    {headers.map((header, index) => (
-                      <TableHead 
-                        key={index}
-                        className="min-w-[150px] bg-white py-4 text-left text-sm font-medium text-gray-900"
+                  ))}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredData.map((row, rowIndex) => {
+                  const savedInDb = isRowInDatabase(row);
+                  return (
+                    <TableRow 
+                      key={rowIndex}
+                      className="group hover:bg-gray-50 transition-colors"
+                    >
+                      <TableCell 
+                        className="sticky left-0 z-20 bg-white group-hover:bg-gray-50 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] w-[200px]"
+                        style={{ position: 'sticky', left: 0 }}
                       >
-                        {header}
-                      </TableHead>
-                    ))}
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredData.map((row, rowIndex) => {
-                    const savedInDb = isRowInDatabase(row);
-                    return (
-                      <TableRow 
-                        key={rowIndex}
-                        className="group hover:bg-gray-50 transition-colors"
-                      >
-                        <TableCell 
-                          className="sticky left-0 z-20 bg-white group-hover:bg-gray-50 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] w-[200px]"
-                          style={{ position: 'sticky', left: 0 }}
-                        >
-                          <div className="flex items-center gap-2 p-2">
-                            <Tooltip>
-                              <TooltipTrigger>
-                                {savedInDb ? (
-                                  <Badge variant="outline" className="bg-green-50 border-green-200">
-                                    <Check className="h-4 w-4 text-green-500 mr-1" />
-                                    Saved
-                                  </Badge>
-                                ) : (
-                                  <Badge variant="outline" className="bg-yellow-50 border-yellow-200">
-                                    <X className="h-4 w-4 text-yellow-500 mr-1" />
-                                    Not Saved
-                                  </Badge>
-                                )}
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                {savedInDb ? 'Click Update to modify data' : 'Click Save to store in database'}
-                              </TooltipContent>
-                            </Tooltip>
-                            <Button
-                              variant={savedInDb ? "outline" : "default"}
-                              size="sm"
-                              onClick={() => handleSaveRow(row)}
-                              className={`
-                                transition-all duration-200 shadow-sm hover:shadow-md
-                                ${savedInDb 
-                                  ? 'bg-white hover:bg-gray-50 text-gray-700 border-gray-200' 
-                                  : 'bg-mint-500 hover:bg-mint-600 text-white'}
-                              `}
-                            >
+                        <div className="flex items-center gap-2 p-2">
+                          <Tooltip>
+                            <TooltipTrigger>
                               {savedInDb ? (
-                                <>
-                                  <RefreshCw className="h-4 w-4 mr-1" />
-                                  Update
-                                </>
+                                <Badge variant="outline" className="bg-green-50 border-green-200">
+                                  <Check className="h-4 w-4 text-green-500 mr-1" />
+                                  Saved
+                                </Badge>
                               ) : (
-                                <>
-                                  <Save className="h-4 w-4 mr-1" />
-                                  Save
-                                </>
+                                <Badge variant="outline" className="bg-yellow-50 border-yellow-200">
+                                  <X className="h-4 w-4 text-yellow-500 mr-1" />
+                                  Not Saved
+                                </Badge>
                               )}
-                            </Button>
-                          </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              {savedInDb ? 'Click Update to modify data' : 'Click Save to store in database'}
+                            </TooltipContent>
+                          </Tooltip>
+                          <Button
+                            variant={savedInDb ? "outline" : "default"}
+                            size="sm"
+                            onClick={() => handleSaveRow(row)}
+                            className={`
+                              transition-all duration-200 shadow-sm hover:shadow-md
+                              ${savedInDb 
+                                ? 'bg-white hover:bg-gray-50 text-gray-700 border-gray-200' 
+                                : 'bg-mint-500 hover:bg-mint-600 text-white'}
+                            `}
+                          >
+                            {savedInDb ? (
+                              <>
+                                <RefreshCw className="h-4 w-4 mr-1" />
+                                Update
+                              </>
+                            ) : (
+                              <>
+                                <Save className="h-4 w-4 mr-1" />
+                                Save
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      </TableCell>
+                      {headers.map((header, colIndex) => (
+                        <TableCell 
+                          key={`${rowIndex}-${colIndex}`}
+                          className={`whitespace-nowrap py-4 px-4 text-sm ${
+                            !['Laycan Status', 'LC&CSA STATUS', 'Loading Status', 'Sales Status'].includes(header) && !isNaN(row[header]) && row[header] !== "" 
+                              ? 'text-right font-mono' 
+                              : 'text-left'
+                          }`}
+                        >
+                          {['Laycan Status', 'LC&CSA STATUS', 'Loading Status', 'Sales Status'].includes(header) ? renderStatusCell(row[header]) : (row[header] || '-')}
                         </TableCell>
-                        {headers.map((header, colIndex) => {
-                          const value = row[header];
-                          const isStatusColumn = [
-                            'Laycan Status',
-                            'LC&CSA STATUS',
-                            'Loading Status',
-                            'Sales Status'
-                          ].includes(header);
-                          
-                          return (
-                            <TableCell 
-                              key={`${rowIndex}-${colIndex}`}
-                              className={`whitespace-nowrap py-4 px-4 text-sm ${
-                                !isStatusColumn && !isNaN(value) && value !== "" ? 'text-right font-mono' : 'text-left'
-                              }`}
-                            >
-                              {isStatusColumn ? renderStatusCell(value) : (value || '-')}
-                            </TableCell>
-                          );
-                        })}
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </div>
-            <ScrollBar orientation="horizontal" />
-          </ScrollArea>
-        </div>
+                      ))}
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
       </div>
 
       <div className="text-sm text-gray-500">
