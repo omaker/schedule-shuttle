@@ -18,8 +18,8 @@ export const ShippingCard = ({ item, getStatusColor }: ShippingCardProps) => {
     try {
       const { error } = await supabase
         .from('shipping_schedules')
-        .upsert({ 
-          excel_id: item.no,
+        .upsert([{ 
+          id: item.id,
           product: item.jenisBarang,
           loading_status: item.status,
           plan_qty: item.berat,
@@ -27,7 +27,7 @@ export const ShippingCard = ({ item, getStatusColor }: ShippingCardProps) => {
           company: item.namaPengirim,
           terminal: item.alamatPengirim,
           country: item.alamatPenerima
-        });
+        }]);
 
       if (error) throw error;
 
@@ -50,7 +50,7 @@ export const ShippingCard = ({ item, getStatusColor }: ShippingCardProps) => {
       const { data, error } = await supabase
         .from('shipping_schedules')
         .select()
-        .eq('excel_id', item.no)
+        .eq('id', item.id)
         .single();
 
       if (error) throw error;
