@@ -1,8 +1,10 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ShippingItem } from "@/types/shipping";
-import { Ship, Anchor, Weight, Calendar } from "lucide-react";
+import { Ship, Anchor, Weight, Calendar, Save, RefreshCw } from "lucide-react";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ShippingCardProps {
   item: ShippingItem;
@@ -10,10 +12,90 @@ interface ShippingCardProps {
 }
 
 export const ShippingCard = ({ item, getStatusColor }: ShippingCardProps) => {
+  const { toast } = useToast();
+
+  const handleSave = async () => {
+    try {
+      const { error } = await supabase
+        .from('shipping_schedules')
+        .upsert({ 
+          excel_id: item.no,
+          product: item.jenisBarang,
+          loading_status: item.status,
+          plan_qty: item.berat,
+          laycan_start: item.tanggalPengiriman,
+          company: item.namaPengirim,
+          terminal: item.alamatPengirim,
+          country: item.alamatPenerima
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Berhasil disimpan",
+        description: "Data telah tersimpan ke database",
+      });
+    } catch (error) {
+      console.error('Error saving data:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Gagal menyimpan data",
+      });
+    }
+  };
+
+  const handleUpdate = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('shipping_schedules')
+        .select()
+        .eq('excel_id', item.no)
+        .single();
+
+      if (error) throw error;
+
+      toast({
+        title: "Data diperbarui",
+        description: "Data telah diperbarui dari database",
+      });
+    } catch (error) {
+      console.error('Error updating data:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Gagal memperbarui data",
+      });
+    }
+  };
+
   return (
     <HoverCard>
       <HoverCardTrigger asChild>
-        <Card className="p-2 transition-all transform hover:shadow-md hover:-translate-y-0.5 bg-gradient-to-br from-slate-50 to-slate-100">
+        <Card className="p-2 transition-all transform hover:shadow-md hover:-translate-y-0.5 bg-gradient-to-br from-slate-50 to-slate-100 relative">
+          <div className="absolute top-2 right-2 flex gap-2">
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                handleSave();
+              }}
+              className="p-1 hover:bg-mint-100 rounded-full transition-colors"
+              title="Save"
+            >
+              <Save className="w-4 h-4 text-mint-600" />
+            </button>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                handleUpdate();
+              }}
+              className="p-1 hover:bg-mint-100 rounded-full transition-colors"
+              title="Update"
+            >
+              <RefreshCw className="w-4 h-4 text-mint-600" />
+            </button>
+          </div>
+
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <Badge className={`${getStatusColor(item.status)} animate-fade-in flex items-center gap-1 text-xs`}>
