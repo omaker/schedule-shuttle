@@ -1,7 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Save, RefreshCw, Check, X } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Save, RefreshCw } from "lucide-react";
 
 interface ActionButtonsProps {
   savedInDb: boolean;
@@ -15,24 +13,6 @@ export const ActionButtons = ({ savedInDb, onSave, rowData }: ActionButtonsProps
       <div className="text-xs text-gray-500 font-medium truncate max-w-[200px]">
         {rowData["Vessel"] || "No Vessel"}
       </div>
-      <Tooltip>
-        <TooltipTrigger>
-          {savedInDb ? (
-            <Badge variant="outline" className="bg-green-50 border-green-200">
-              <Check className="h-4 w-4 text-green-500 mr-1" />
-              Saved
-            </Badge>
-          ) : (
-            <Badge variant="outline" className="bg-yellow-50 border-yellow-200">
-              <X className="h-4 w-4 text-yellow-500 mr-1" />
-              Not Saved
-            </Badge>
-          )}
-        </TooltipTrigger>
-        <TooltipContent>
-          {savedInDb ? 'Click Update to modify data' : 'Click Save to store in database'}
-        </TooltipContent>
-      </Tooltip>
       <Button
         variant={savedInDb ? "outline" : "default"}
         size="sm"
