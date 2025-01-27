@@ -103,7 +103,7 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
       </div>
 
       <ScrollArea className="h-[600px] bg-transparent">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 p-6">
           {filteredData.map((row, index) => (
             <ShippingCard
               key={index}
