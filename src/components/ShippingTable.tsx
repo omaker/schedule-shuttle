@@ -22,6 +22,7 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
   const tableRef = useRef<HTMLDivElement>(null);
+  const [scrollPosition, setScrollPosition] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -261,6 +262,11 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
     );
   }
 
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLDivElement;
+    setScrollPosition(target.scrollLeft);
+  };
+
   return (
     <div className="space-y-4">
       <div className="relative">
@@ -274,15 +280,12 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
       </div>
 
       <div className="rounded-lg border bg-white shadow-sm">
-        <ScrollArea className="h-[600px] rounded-md">
+        <ScrollArea className="h-[600px] rounded-md" onScroll={handleScroll}>
           <div className="relative">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead 
-                    className="sticky left-0 z-30 bg-white w-[200px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]"
-                    style={{ position: 'sticky', left: 0 }}
-                  >
+                  <TableHead className="bg-white w-[200px]">
                     Status & Actions
                   </TableHead>
                   {headers.map((header, index) => (
@@ -301,13 +304,24 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
                   return (
                     <TableRow 
                       key={rowIndex}
-                      className="group hover:bg-gray-50 transition-colors"
+                      className="group hover:bg-gray-50 transition-colors relative"
                     >
-                      <TableCell 
-                        className="sticky left-0 z-20 bg-white group-hover:bg-gray-50 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] w-[200px]"
-                        style={{ position: 'sticky', left: 0 }}
-                      >
-                        <div className="flex items-center gap-2 p-2">
+                      <TableCell className="w-[200px] bg-white group-hover:bg-gray-50">
+                        <div 
+                          className="flex items-center gap-2 p-2"
+                          style={{
+                            position: 'absolute',
+                            left: `${scrollPosition}px`,
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                            zIndex: 40,
+                            transition: 'left 0.1s ease-out',
+                            backgroundColor: 'white',
+                            padding: '0.5rem',
+                            borderRadius: '0.375rem',
+                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                          }}
+                        >
                           <Tooltip>
                             <TooltipTrigger>
                               {savedInDb ? (
@@ -331,7 +345,7 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
                             size="sm"
                             onClick={() => handleSaveRow(row)}
                             className={`
-                              transition-all duration-200 shadow-sm hover:shadow-md
+                              transition-all duration-200 shadow-sm hover:shadow-md whitespace-nowrap
                               ${savedInDb 
                                 ? 'bg-white hover:bg-gray-50 text-gray-700 border-gray-200' 
                                 : 'bg-mint-500 hover:bg-mint-600 text-white'}
@@ -360,7 +374,9 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
                               : 'text-left'
                           }`}
                         >
-                          {['Laycan Status', 'LC&CSA STATUS', 'Loading Status', 'Sales Status'].includes(header) ? renderStatusCell(row[header]) : (row[header] || '-')}
+                          {['Laycan Status', 'LC&CSA STATUS', 'Loading Status', 'Sales Status'].includes(header) 
+                            ? renderStatusCell(row[header]) 
+                            : (row[header] || '-')}
                         </TableCell>
                       ))}
                     </TableRow>
