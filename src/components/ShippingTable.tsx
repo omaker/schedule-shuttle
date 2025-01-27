@@ -1,8 +1,12 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { Search } from "lucide-react";
+import { Search, Upload } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import * as XLSX from "xlsx";
 
 interface ShippingTableProps {
   data: any[];
@@ -10,6 +14,7 @@ interface ShippingTableProps {
 
 export const ShippingTable = ({ data }: ShippingTableProps) => {
   const [searchTerm, setSearchTerm] = useState("");
+  const { toast } = useToast();
   const headers = [
     "EXCEL ID", "Year", "Month", "Fin Month", "Product", "Laycan Status", "First ETA", "Vessel", "Company",
     "Laycan Start", "Laycan Stop", "ETA", "Commence", "ATC", "Terminal", "L/R", "Dem Rate", "Plan Qty",
@@ -36,6 +41,66 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
     )
   );
 
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>, rowData: any) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const data = e.target?.result;
+        const workbook = XLSX.read(data, { type: "binary" });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        
+        // Skip the first 6 rows and start from row 7
+        const range = XLSX.utils.decode_range(worksheet["!ref"] || "A1");
+        range.s.r = 6;
+        worksheet["!ref"] = XLSX.utils.encode_range(range);
+        
+        const excelData = XLSX.utils.sheet_to_json(worksheet, { header: "A" });
+        
+        if (excelData.length === 0) {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "No data found in the Excel file",
+          });
+          return;
+        }
+
+        // Insert the data into Supabase
+        const { error } = await supabase
+          .from('shipping_schedules')
+          .insert(excelData[0]); // Only insert the first row
+
+        if (error) {
+          console.error("Error inserting data:", error);
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Failed to upload data",
+          });
+          return;
+        }
+
+        toast({
+          title: "Success",
+          description: "Data uploaded successfully",
+        });
+      } catch (error) {
+        console.error("Error processing file:", error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to process Excel file",
+        });
+      }
+    };
+
+    reader.readAsBinaryString(file);
+  };
+
   return (
     <div className="space-y-4">
       {/* Search Bar */}
@@ -56,6 +121,9 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
             <Table>
               <TableHeader className="sticky top-0 z-10 bg-white shadow-sm">
                 <TableRow>
+                  <TableHead className="sticky left-0 z-20 bg-white min-w-[100px]">
+                    Actions
+                  </TableHead>
                   {headers.map((header, index) => (
                     <TableHead 
                       key={index}
@@ -72,6 +140,26 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
                     key={rowIndex}
                     className="hover:bg-gray-50 transition-colors"
                   >
+                    <TableCell className="sticky left-0 z-10 bg-white">
+                      <div className="flex items-center">
+                        <input
+                          type="file"
+                          id={`file-upload-${rowIndex}`}
+                          className="hidden"
+                          accept=".xlsx,.xls"
+                          onChange={(e) => handleFileUpload(e, row)}
+                        />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full"
+                          onClick={() => document.getElementById(`file-upload-${rowIndex}`)?.click()}
+                        >
+                          <Upload className="h-4 w-4 mr-1" />
+                          Upload
+                        </Button>
+                      </div>
+                    </TableCell>
                     {headers.map((header, colIndex) => {
                       const value = row[header];
                       const isNumeric = !isNaN(value) && value !== "";
