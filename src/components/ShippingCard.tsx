@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ShippingItem } from "@/types/shipping";
-import { Ship, Anchor, Weight, Calendar, Save, RefreshCw } from "lucide-react";
+import { Ship, Anchor, Weight, Calendar, Save, RefreshCw, ChevronRight, ChevronDown } from "lucide-react";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,11 +10,13 @@ import { useEffect, useState } from "react";
 interface ShippingCardProps {
   item: ShippingItem;
   getStatusColor: (status: string) => string;
+  view: "grid" | "compact";
 }
 
-export const ShippingCard = ({ item, getStatusColor }: ShippingCardProps) => {
+export const ShippingCard = ({ item, getStatusColor, view }: ShippingCardProps) => {
   const { toast } = useToast();
   const [exists, setExists] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
     const checkIfExists = async () => {
@@ -102,6 +104,43 @@ export const ShippingCard = ({ item, getStatusColor }: ShippingCardProps) => {
     }
   };
 
+  if (view === "compact") {
+    return (
+      <Card className="p-4 hover:bg-gray-50 transition-colors border-l-4 border-l-mint-500 cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Badge className={`${getStatusColor(item.status)} animate-fade-in flex items-center gap-1.5`}>
+              <Ship className="w-3 h-3" />
+              {item.status}
+            </Badge>
+            <span className="text-sm font-medium text-mint-800">{item.jenisBarang}</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-500">{item.berat} ton</span>
+            {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+          </div>
+        </div>
+        
+        {isExpanded && (
+          <div className="mt-4 space-y-2 text-sm text-gray-600">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="font-medium">From:</p>
+                <p>{item.namaPengirim}</p>
+                <p className="text-gray-500">{item.alamatPengirim}</p>
+              </div>
+              <div>
+                <p className="font-medium">To:</p>
+                <p>{item.namaPenerima}</p>
+                <p className="text-gray-500">{item.alamatPenerima}</p>
+              </div>
+            </div>
+          </div>
+        )}
+      </Card>
+    );
+  }
+
   return (
     <HoverCard>
       <HoverCardTrigger asChild>
@@ -136,13 +175,11 @@ export const ShippingCard = ({ item, getStatusColor }: ShippingCardProps) => {
 
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Badge className={`${getStatusColor(item.status)} animate-fade-in flex items-center gap-1.5 text-sm px-3 py-1`}>
-                  <Ship className="w-4 h-4" />
-                  {item.status}
-                </Badge>
-                <span className="text-sm text-gray-500 font-mono">#{item.no}</span>
-              </div>
+              <Badge className={`${getStatusColor(item.status)} animate-fade-in flex items-center gap-1.5 text-sm px-3 py-1`}>
+                <Ship className="w-4 h-4" />
+                {item.status}
+              </Badge>
+              <span className="text-sm text-gray-500 font-mono">#{item.no}</span>
             </div>
             
             <div className="space-y-3">

@@ -1,10 +1,11 @@
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
-import { Search, Loader2 } from "lucide-react";
+import { Search, Loader2, Filter } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ShippingCard } from "./ShippingCard";
+import { Button } from "@/components/ui/button";
 
 interface ShippingTableProps {
   data: any[];
@@ -14,6 +15,7 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [dbData, setDbData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [view, setView] = useState<"grid" | "compact">("grid");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -92,31 +94,61 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
 
   return (
     <div className="space-y-6 bg-gray-50 p-8 rounded-lg shadow-sm">
-      <div className="relative max-w-md mx-auto">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
-        <Input
-          placeholder="Search shipping schedules..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10 bg-white border-gray-200"
-        />
+      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+        <div className="relative w-full max-w-md">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
+          <Input
+            placeholder="Search shipping schedules..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 bg-white border-gray-200"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant={view === "grid" ? "default" : "outline"}
+            onClick={() => setView("grid")}
+            className="w-24"
+          >
+            Grid
+          </Button>
+          <Button
+            variant={view === "compact" ? "default" : "outline"}
+            onClick={() => setView("compact")}
+            className="w-24"
+          >
+            Compact
+          </Button>
+        </div>
       </div>
 
-      <ScrollArea className="h-[calc(100vh-12rem)] bg-transparent px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 p-4">
+      <ScrollArea className="h-[calc(100vh-14rem)] bg-transparent px-4">
+        <div className={`
+          ${view === "grid" 
+            ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" 
+            : "flex flex-col gap-4"}
+          p-4
+        `}>
           {filteredData.map((row, index) => (
             <ShippingCard
               key={index}
               item={mapRowToShippingItem(row)}
               getStatusColor={getStatusColor}
+              view={view}
             />
           ))}
         </div>
         <ScrollBar orientation="vertical" />
       </ScrollArea>
 
-      <div className="text-sm text-gray-500 bg-white p-4 rounded-md shadow-sm text-center">
-        Showing {filteredData.length} of {data.length} entries
+      <div className="flex items-center justify-between bg-white p-4 rounded-md shadow-sm">
+        <span className="text-sm text-gray-500">
+          Showing {filteredData.length} of {data.length} entries
+        </span>
+        <div className="flex items-center gap-2 text-sm text-gray-500">
+          <Filter className="h-4 w-4" />
+          <span>Use search to filter results</span>
+        </div>
       </div>
     </div>
   );
