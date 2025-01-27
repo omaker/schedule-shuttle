@@ -105,8 +105,8 @@ export const ShippingCard = ({ item, getStatusColor }: ShippingCardProps) => {
   return (
     <HoverCard>
       <HoverCardTrigger asChild>
-        <Card className="p-6 transition-all transform hover:shadow-md hover:-translate-y-0.5 bg-gradient-to-br from-slate-50 to-slate-100 relative min-w-[350px]">
-          <div className="absolute top-6 right-6">
+        <Card className="p-6 transition-all transform hover:shadow-lg hover:-translate-y-1 bg-gradient-to-br from-white to-gray-50 relative min-w-[300px] border border-gray-100">
+          <div className="absolute top-4 right-4">
             {!exists ? (
               <button
                 onClick={(e) => {
@@ -149,7 +149,7 @@ export const ShippingCard = ({ item, getStatusColor }: ShippingCardProps) => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-mint-800">
                   <Anchor className="w-4 h-4" />
-                  <p className="text-base font-medium">{item.jenisBarang}</p>
+                  <p className="text-base font-medium truncate max-w-[200px]">{item.jenisBarang}</p>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-gray-600">
                   <Weight className="w-4 h-4 text-mint-600" />

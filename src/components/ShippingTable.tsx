@@ -91,19 +91,19 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
   });
 
   return (
-    <div className="space-y-4 bg-gray-50 p-6 rounded-lg shadow-sm">
-      <div className="relative">
+    <div className="space-y-6 bg-gray-50 p-8 rounded-lg shadow-sm">
+      <div className="relative max-w-md mx-auto">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
         <Input
-          placeholder="Search in cards..."
+          placeholder="Search shipping schedules..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10 max-w-sm bg-white border-gray-200"
+          className="pl-10 bg-white border-gray-200"
         />
       </div>
 
-      <ScrollArea className="h-[600px] bg-transparent">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 p-6">
+      <ScrollArea className="h-[calc(100vh-12rem)] bg-transparent px-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 p-4">
           {filteredData.map((row, index) => (
             <ShippingCard
               key={index}
@@ -115,7 +115,7 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
         <ScrollBar orientation="vertical" />
       </ScrollArea>
 
-      <div className="text-sm text-gray-500 bg-white p-3 rounded-md shadow-sm">
+      <div className="text-sm text-gray-500 bg-white p-4 rounded-md shadow-sm text-center">
         Showing {filteredData.length} of {data.length} entries
       </div>
     </div>
