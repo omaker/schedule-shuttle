@@ -3,10 +3,9 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { Search, Upload } from "lucide-react";
+import { Search, Save } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import * as XLSX from "xlsx";
 import { Database } from "@/integrations/supabase/types";
 
 type ShippingSchedule = Database['public']['Tables']['shipping_schedules']['Insert'];
@@ -44,145 +43,117 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
     )
   );
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>, rowData: any) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  const handleSaveRow = async (rowData: any) => {
+    try {
+      console.log("Saving row data:", rowData);
 
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      try {
-        const data = e.target?.result;
-        const workbook = XLSX.read(data, { type: "binary" });
-        const sheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[sheetName];
-        
-        // Skip the first 6 rows and start from row 7
-        const range = XLSX.utils.decode_range(worksheet["!ref"] || "A1");
-        range.s.r = 6;
-        worksheet["!ref"] = XLSX.utils.encode_range(range);
-        
-        const excelData = XLSX.utils.sheet_to_json(worksheet, { header: "A" });
-        
-        if (excelData.length === 0) {
-          toast({
-            variant: "destructive",
-            title: "Error",
-            description: "No data found in the Excel file",
-          });
-          return;
-        }
+      // Map the row data to match the database schema
+      const mappedData: ShippingSchedule = {
+        excel_id: rowData["EXCEL ID"], // Required field
+        year: rowData["Year"] ? Number(rowData["Year"]) : null,
+        month: rowData["Month"] ? Number(rowData["Month"]) : null,
+        fin_month: rowData["Fin Month"] ? Number(rowData["Fin Month"]) : null,
+        product: rowData["Product"] || null,
+        laycan_status: rowData["Laycan Status"] || null,
+        vessel: rowData["Vessel"] || null,
+        company: rowData["Company"] || null,
+        laycan_start: rowData["Laycan Start"] ? Number(rowData["Laycan Start"]) : null,
+        laycan_stop: rowData["Laycan Stop"] ? Number(rowData["Laycan Stop"]) : null,
+        eta: rowData["ETA"] ? Number(rowData["ETA"]) : null,
+        terminal: rowData["Terminal"] || null,
+        plan_qty: rowData["Plan Qty"] ? Number(rowData["Plan Qty"]) : null,
+        lcsa_status: rowData["LC&CSA STATUS"] || null,
+        total_qty: rowData["Total Qty"] ? Number(rowData["Total Qty"]) : null,
+        laydays: rowData["Laydays"] ? Number(rowData["Laydays"]) : null,
+        arrival: rowData["Arrival"] || null,
+        laytime_start: rowData["Laytime Start"] ? Number(rowData["Laytime Start"]) : null,
+        laytime_stop: rowData["Laytime Stop"] ? Number(rowData["Laytime Stop"]) : null,
+        act_lr: rowData["Act L/R"] || null,
+        loading_status: rowData["Loading Status"] || null,
+        complete: rowData["complete"] ? Number(rowData["complete"]) : null,
+        laycan_part: rowData["Laycan Part"] || null,
+        laycan_period: rowData["Laycan Period"] ? Number(rowData["Laycan Period"]) : null,
+        ship_code: rowData["Ship Code"] || null,
+        sales_status: rowData["Sales Status"] || null,
+        dy: rowData["DY"] ? Number(rowData["DY"]) : null,
+        incoterm: rowData["Incoterm"] || null,
+        contract_period: rowData["Contract Period"] || null,
+        direct_ais: rowData["Direct / AIS"] || null,
+        ship_code_omdb: rowData["Ship Code OMDB"] || null,
+        country: rowData["Country"] || null,
+        region: rowData["Region"] || null,
+        price_code: rowData["Price Code"] || null,
+        fixed_index_linked: rowData["Fixed/Index Linked"] || null,
+        pricing_period: rowData["Pricing Period"] || null,
+        settled_floating: rowData["Settled/Floating"] || null,
+        price_fob_vessel: rowData["Price (FOB Vessel)"] ? Number(rowData["Price (FOB Vessel)"]) : null,
+        price_adj_load_port: rowData["Price Adj Load Port"] ? Number(rowData["Price Adj Load Port"]) : null,
+        price_adj_load_port_cv: rowData["Price Adj Load Port and CV"] ? Number(rowData["Price Adj Load Port and CV"]) : null,
+        price_fob_vessel_adj_cv: rowData["Price FOB Vessel Adj CV"] ? Number(rowData["Price FOB Vessel Adj CV"]) : null,
+        revenue: rowData["Revenue"] ? Number(rowData["Revenue"]) : null,
+        revenue_adj_loadport: rowData["Revenue Adj to Loadport"] ? Number(rowData["Revenue Adj to Loadport"]) : null,
+        revenue_adj_load_port_cv: rowData["Revenue adj to load port and CV"] ? Number(rowData["Revenue adj to load port and CV"]) : null,
+        revenue_fob_vessel_cv: rowData["Revenue FOB Vessel and CV"] ? Number(rowData["Revenue FOB Vessel and CV"]) : null,
+        cv_typical: rowData["CV Typical"] ? Number(rowData["CV Typical"]) : null,
+        cv_acceptable: rowData["CV Acceptable"] ? Number(rowData["CV Acceptable"]) : null,
+        bc_iup: rowData["BC IUP"] || null,
+        bc_tonnage: rowData["BC Tonnage"] ? Number(rowData["BC Tonnage"]) : null,
+        ai_tonnage: rowData["AI Tonnage"] ? Number(rowData["AI Tonnage"]) : null,
+        bc_cv: rowData["BC CV"] ? Number(rowData["BC CV"]) : null,
+        ai_cv: rowData["AI CV"] ? Number(rowData["AI CV"]) : null,
+        expected_blended_cv: rowData["Expected blended CV"] ? Number(rowData["Expected blended CV"]) : null,
+        cv_typical_tonnage: rowData["CV Typical x tonnage"] ? Number(rowData["CV Typical x tonnage"]) : null,
+        cv_rejection_tonnage: rowData["CV Rejection x tonnage"] ? Number(rowData["CV Rejection x tonnage"]) : null,
+        cv_acceptable_tonnage: rowData["CV Acceptable x tonnage"] ? Number(rowData["CV Acceptable x tonnage"]) : null,
+        pit: rowData["PIT"] || null,
+        product_marketing: rowData["Product Marketing"] || null,
+        price_code_non_capped: rowData["Price code non-capped"] || null,
+        price_non_capped: rowData["Price non-capped"] ? Number(rowData["Price non-capped"]) : null,
+        price_non_capped_adj_lp_cv_acc: rowData["Price non-capped Adj LP CV Acc"] ? Number(rowData["Price non-capped Adj LP CV Acc"]) : null,
+        revenue_non_capped_adj_lp_cv_acc: rowData["Revenue non-capped Adj LP CV Acc"] ? Number(rowData["Revenue non-capped Adj LP CV Acc"]) : null,
+        cv_ar: rowData["CV AR"] ? Number(rowData["CV AR"]) : null,
+        tm: rowData["TM"] ? Number(rowData["TM"]) : null,
+        ts_adb: rowData["TS ADB"] ? Number(rowData["TS ADB"]) : null,
+        ash_ar: rowData["ASH AR"] ? Number(rowData["ASH AR"]) : null,
+        hpb_cap: rowData["HPB Cap"] ? Number(rowData["HPB Cap"]) : null,
+        hba_2: rowData["HBA 2"] ? Number(rowData["HBA 2"]) : null,
+        hpb_market: rowData["HPB Market"] ? Number(rowData["HPB Market"]) : null,
+        blu_tarif: rowData["BLU Tarif"] ? Number(rowData["BLU Tarif"]) : null,
+        pungutan_blu: rowData["Pungutan BLU"] ? Number(rowData["Pungutan BLU"]) : null,
+        revenue_capped: rowData["Revenue Capped"] ? Number(rowData["Revenue Capped"]) : null,
+        revenue_non_capped: rowData["Revenue Non-Capped"] ? Number(rowData["Revenue Non-Capped"]) : null,
+        incremental_revenue: rowData["Incremental Revenue"] ? Number(rowData["Incremental Revenue"]) : null,
+        net_blu_expense_income: rowData["Net BLU Expense/(Income)"] ? Number(rowData["Net BLU Expense/(Income)"]) : null
+      };
 
-        // Map Excel data to match the database schema
-        const mappedData: ShippingSchedule = {
-          excel_id: rowData["EXCEL ID"], // Required field
-          year: rowData["Year"] ? Number(rowData["Year"]) : null,
-          month: rowData["Month"] ? Number(rowData["Month"]) : null,
-          fin_month: rowData["Fin Month"] ? Number(rowData["Fin Month"]) : null,
-          product: rowData["Product"] || null,
-          laycan_status: rowData["Laycan Status"] || null,
-          vessel: rowData["Vessel"] || null,
-          company: rowData["Company"] || null,
-          laycan_start: rowData["Laycan Start"] ? Number(rowData["Laycan Start"]) : null,
-          laycan_stop: rowData["Laycan Stop"] ? Number(rowData["Laycan Stop"]) : null,
-          eta: rowData["ETA"] ? Number(rowData["ETA"]) : null,
-          terminal: rowData["Terminal"] || null,
-          plan_qty: rowData["Plan Qty"] ? Number(rowData["Plan Qty"]) : null,
-          lcsa_status: rowData["LC&CSA STATUS"] || null,
-          total_qty: rowData["Total Qty"] ? Number(rowData["Total Qty"]) : null,
-          laydays: rowData["Laydays"] ? Number(rowData["Laydays"]) : null,
-          arrival: rowData["Arrival"] || null,
-          laytime_start: rowData["Laytime Start"] ? Number(rowData["Laytime Start"]) : null,
-          laytime_stop: rowData["Laytime Stop"] ? Number(rowData["Laytime Stop"]) : null,
-          act_lr: rowData["Act L/R"] || null,
-          loading_status: rowData["Loading Status"] || null,
-          complete: rowData["complete"] ? Number(rowData["complete"]) : null,
-          laycan_part: rowData["Laycan Part"] || null,
-          laycan_period: rowData["Laycan Period"] ? Number(rowData["Laycan Period"]) : null,
-          ship_code: rowData["Ship Code"] || null,
-          sales_status: rowData["Sales Status"] || null,
-          dy: rowData["DY"] ? Number(rowData["DY"]) : null,
-          incoterm: rowData["Incoterm"] || null,
-          contract_period: rowData["Contract Period"] || null,
-          direct_ais: rowData["Direct / AIS"] || null,
-          ship_code_omdb: rowData["Ship Code OMDB"] || null,
-          country: rowData["Country"] || null,
-          region: rowData["Region"] || null,
-          price_code: rowData["Price Code"] || null,
-          fixed_index_linked: rowData["Fixed/Index Linked"] || null,
-          pricing_period: rowData["Pricing Period"] || null,
-          settled_floating: rowData["Settled/Floating"] || null,
-          price_fob_vessel: rowData["Price (FOB Vessel)"] ? Number(rowData["Price (FOB Vessel)"]) : null,
-          price_adj_load_port: rowData["Price Adj Load Port"] ? Number(rowData["Price Adj Load Port"]) : null,
-          price_adj_load_port_cv: rowData["Price Adj Load Port and CV"] ? Number(rowData["Price Adj Load Port and CV"]) : null,
-          price_fob_vessel_adj_cv: rowData["Price FOB Vessel Adj CV"] ? Number(rowData["Price FOB Vessel Adj CV"]) : null,
-          revenue: rowData["Revenue"] ? Number(rowData["Revenue"]) : null,
-          revenue_adj_loadport: rowData["Revenue Adj to Loadport"] ? Number(rowData["Revenue Adj to Loadport"]) : null,
-          revenue_adj_load_port_cv: rowData["Revenue adj to load port and CV"] ? Number(rowData["Revenue adj to load port and CV"]) : null,
-          revenue_fob_vessel_cv: rowData["Revenue FOB Vessel and CV"] ? Number(rowData["Revenue FOB Vessel and CV"]) : null,
-          cv_typical: rowData["CV Typical"] ? Number(rowData["CV Typical"]) : null,
-          cv_acceptable: rowData["CV Acceptable"] ? Number(rowData["CV Acceptable"]) : null,
-          bc_iup: rowData["BC IUP"] || null,
-          bc_tonnage: rowData["BC Tonnage"] ? Number(rowData["BC Tonnage"]) : null,
-          ai_tonnage: rowData["AI Tonnage"] ? Number(rowData["AI Tonnage"]) : null,
-          bc_cv: rowData["BC CV"] ? Number(rowData["BC CV"]) : null,
-          ai_cv: rowData["AI CV"] ? Number(rowData["AI CV"]) : null,
-          expected_blended_cv: rowData["Expected blended CV"] ? Number(rowData["Expected blended CV"]) : null,
-          cv_typical_tonnage: rowData["CV Typical x tonnage"] ? Number(rowData["CV Typical x tonnage"]) : null,
-          cv_rejection_tonnage: rowData["CV Rejection x tonnage"] ? Number(rowData["CV Rejection x tonnage"]) : null,
-          cv_acceptable_tonnage: rowData["CV Acceptable x tonnage"] ? Number(rowData["CV Acceptable x tonnage"]) : null,
-          pit: rowData["PIT"] || null,
-          product_marketing: rowData["Product Marketing"] || null,
-          price_code_non_capped: rowData["Price code non-capped"] || null,
-          price_non_capped: rowData["Price non-capped"] ? Number(rowData["Price non-capped"]) : null,
-          price_non_capped_adj_lp_cv_acc: rowData["Price non-capped Adj LP CV Acc"] ? Number(rowData["Price non-capped Adj LP CV Acc"]) : null,
-          revenue_non_capped_adj_lp_cv_acc: rowData["Revenue non-capped Adj LP CV Acc"] ? Number(rowData["Revenue non-capped Adj LP CV Acc"]) : null,
-          cv_ar: rowData["CV AR"] ? Number(rowData["CV AR"]) : null,
-          tm: rowData["TM"] ? Number(rowData["TM"]) : null,
-          ts_adb: rowData["TS ADB"] ? Number(rowData["TS ADB"]) : null,
-          ash_ar: rowData["ASH AR"] ? Number(rowData["ASH AR"]) : null,
-          hpb_cap: rowData["HPB Cap"] ? Number(rowData["HPB Cap"]) : null,
-          hba_2: rowData["HBA 2"] ? Number(rowData["HBA 2"]) : null,
-          hpb_market: rowData["HPB Market"] ? Number(rowData["HPB Market"]) : null,
-          blu_tarif: rowData["BLU Tarif"] ? Number(rowData["BLU Tarif"]) : null,
-          pungutan_blu: rowData["Pungutan BLU"] ? Number(rowData["Pungutan BLU"]) : null,
-          revenue_capped: rowData["Revenue Capped"] ? Number(rowData["Revenue Capped"]) : null,
-          revenue_non_capped: rowData["Revenue Non-Capped"] ? Number(rowData["Revenue Non-Capped"]) : null,
-          incremental_revenue: rowData["Incremental Revenue"] ? Number(rowData["Incremental Revenue"]) : null,
-          net_blu_expense_income: rowData["Net BLU Expense/(Income)"] ? Number(rowData["Net BLU Expense/(Income)"]) : null
-        };
+      console.log("Mapped data:", mappedData);
 
-        console.log("Mapped data:", mappedData); // Debug log
+      const { error } = await supabase
+        .from('shipping_schedules')
+        .insert(mappedData);
 
-        // Insert the data into Supabase
-        const { error } = await supabase
-          .from('shipping_schedules')
-          .insert(mappedData);
-
-        if (error) {
-          console.error("Error inserting data:", error);
-          toast({
-            variant: "destructive",
-            title: "Error",
-            description: "Failed to upload data",
-          });
-          return;
-        }
-
-        toast({
-          title: "Success",
-          description: "Data uploaded successfully",
-        });
-      } catch (error) {
-        console.error("Error processing file:", error);
+      if (error) {
+        console.error("Error inserting data:", error);
         toast({
           variant: "destructive",
           title: "Error",
-          description: "Failed to process Excel file",
+          description: "Failed to save data",
         });
+        return;
       }
-    };
 
-    reader.readAsBinaryString(file);
+      toast({
+        title: "Success",
+        description: "Data saved successfully",
+      });
+    } catch (error) {
+      console.error("Error saving data:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to save data",
+      });
+    }
   };
 
   return (
@@ -224,25 +195,16 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
                     key={rowIndex}
                     className="hover:bg-gray-50 transition-colors"
                   >
-                    <TableCell className="sticky left-0 z-10 bg-white">
-                      <div className="flex items-center">
-                        <input
-                          type="file"
-                          id={`file-upload-${rowIndex}`}
-                          className="hidden"
-                          accept=".xlsx,.xls"
-                          onChange={(e) => handleFileUpload(e, row)}
-                        />
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="w-full"
-                          onClick={() => document.getElementById(`file-upload-${rowIndex}`)?.click()}
-                        >
-                          <Upload className="h-4 w-4 mr-1" />
-                          Upload
-                        </Button>
-                      </div>
+                    <TableCell className="sticky left-0 z-10 bg-white shadow-sm">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full"
+                        onClick={() => handleSaveRow(row)}
+                      >
+                        <Save className="h-4 w-4 mr-1" />
+                        Save
+                      </Button>
                     </TableCell>
                     {headers.map((header, colIndex) => {
                       const value = row[header];
