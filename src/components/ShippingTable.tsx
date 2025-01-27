@@ -19,7 +19,6 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [dbData, setDbData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedRow, setSelectedRow] = useState<any | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -272,60 +271,66 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
         />
       </div>
 
-      <div className="rounded-lg border bg-white shadow-sm">
-        {selectedRow && (
-          <ActionButtons
-            savedInDb={isRowInDatabase(selectedRow)}
-            onSave={() => handleSaveRow(selectedRow)}
-          />
-        )}
-        <ScrollArea className="h-[600px] rounded-md border">
-          <Table>
-            <TableHeader className="sticky top-0 z-10 bg-white shadow-sm">
-              <TableRow>
-                {headers.map((header, index) => (
-                  <TableHead 
-                    key={index}
-                    className="min-w-[150px] bg-white py-4 text-left text-sm font-medium text-gray-900 hover:bg-gray-50"
-                  >
-                    {header}
-                  </TableHead>
-                ))}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredData.map((row, rowIndex) => (
-                <TableRow 
-                  key={rowIndex}
-                  className="hover:bg-gray-50 transition-colors cursor-pointer"
-                  onClick={() => setSelectedRow(row)}
-                >
-                  {headers.map((header, colIndex) => {
-                    const value = row[header];
-                    const isStatusColumn = [
-                      'Laycan Status',
-                      'LC&CSA STATUS',
-                      'Loading Status',
-                      'Sales Status'
-                    ].includes(header);
-                    
-                    return (
-                      <TableCell 
-                        key={`${rowIndex}-${colIndex}`}
-                        className={`whitespace-nowrap py-4 px-4 text-sm ${
-                          !isStatusColumn && !isNaN(value) && value !== "" ? 'text-right font-mono' : 'text-left'
-                        }`}
-                      >
-                        {isStatusColumn ? renderStatusCell(value) : (value || '-')}
-                      </TableCell>
-                    );
-                  })}
+      <div className="flex gap-4">
+        <div className="flex flex-col space-y-2 min-w-[220px]">
+          {filteredData.map((row, index) => (
+            <ActionButtons
+              key={index}
+              savedInDb={isRowInDatabase(row)}
+              onSave={() => handleSaveRow(row)}
+              rowData={row}
+            />
+          ))}
+        </div>
+
+        <div className="rounded-lg border bg-white shadow-sm flex-1">
+          <ScrollArea className="h-[600px] rounded-md border">
+            <Table>
+              <TableHeader className="sticky top-0 z-10 bg-white shadow-sm">
+                <TableRow>
+                  {headers.map((header, index) => (
+                    <TableHead 
+                      key={index}
+                      className="min-w-[150px] bg-white py-4 text-left text-sm font-medium text-gray-900 hover:bg-gray-50"
+                    >
+                      {header}
+                    </TableHead>
+                  ))}
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
+              </TableHeader>
+              <TableBody>
+                {filteredData.map((row, rowIndex) => (
+                  <TableRow 
+                    key={rowIndex}
+                    className="hover:bg-gray-50 transition-colors"
+                  >
+                    {headers.map((header, colIndex) => {
+                      const value = row[header];
+                      const isStatusColumn = [
+                        'Laycan Status',
+                        'LC&CSA STATUS',
+                        'Loading Status',
+                        'Sales Status'
+                      ].includes(header);
+                      
+                      return (
+                        <TableCell 
+                          key={`${rowIndex}-${colIndex}`}
+                          className={`whitespace-nowrap py-4 px-4 text-sm ${
+                            !isStatusColumn && !isNaN(value) && value !== "" ? 'text-right font-mono' : 'text-left'
+                          }`}
+                        >
+                          {isStatusColumn ? renderStatusCell(value) : (value || '-')}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
+        </div>
       </div>
 
       <div className="text-sm text-gray-500">

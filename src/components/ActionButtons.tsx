@@ -6,11 +6,15 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 interface ActionButtonsProps {
   savedInDb: boolean;
   onSave: () => void;
+  rowData: any;
 }
 
-export const ActionButtons = ({ savedInDb, onSave }: ActionButtonsProps) => {
+export const ActionButtons = ({ savedInDb, onSave, rowData }: ActionButtonsProps) => {
   return (
-    <div className="fixed left-4 z-50 bg-white/95 p-2 rounded-lg shadow-lg backdrop-blur-sm ring-1 ring-black/5 space-y-2">
+    <div className="flex flex-col items-start space-y-2 p-2 bg-white/95 rounded-lg shadow-sm backdrop-blur-sm ring-1 ring-black/5">
+      <div className="text-xs text-gray-500 font-medium truncate max-w-[200px]">
+        {rowData["Vessel"] || "No Vessel"}
+      </div>
       <Tooltip>
         <TooltipTrigger>
           {savedInDb ? (
