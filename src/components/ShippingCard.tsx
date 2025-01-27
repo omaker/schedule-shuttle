@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ShippingItem } from "@/types/shipping";
-import { Ship, Anchor, Weight, Calendar, Save, RefreshCw, ChevronRight, ChevronDown, Package } from "lucide-react";
+import { Ship, Weight, Calendar, Save, RefreshCw, ChevronRight, ChevronDown, Package } from "lucide-react";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -103,7 +103,7 @@ export const ShippingCard = ({ item, getStatusColor, view }: ShippingCardProps) 
   if (view === "compact") {
     return (
       <Card 
-        className="p-4 hover:bg-gray-50 transition-all border-l-4 border-l-mint-500 cursor-pointer animate-fade-in" 
+        className="p-4 hover:bg-gray-50 transition-all border-l-4 border-l-mint-500 cursor-pointer animate-fade-in relative group" 
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex items-center justify-between">
@@ -119,6 +119,31 @@ export const ShippingCard = ({ item, getStatusColor, view }: ShippingCardProps) 
           </div>
           <div className="flex items-center gap-4">
             <span className="text-sm text-gray-500">{item.berat} ton</span>
+            {!exists ? (
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleSave();
+                }}
+                className="opacity-0 group-hover:opacity-100 transition-opacity px-2 py-1 rounded-md hover:bg-mint-50 text-mint-600 text-sm flex items-center gap-1"
+              >
+                <Save className="w-4 h-4" />
+                Save
+              </button>
+            ) : (
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleUpdate();
+                }}
+                className="opacity-0 group-hover:opacity-100 transition-opacity px-2 py-1 rounded-md hover:bg-mint-50 text-mint-600 text-sm flex items-center gap-1"
+              >
+                <RefreshCw className="w-4 h-4" />
+                Update
+              </button>
+            )}
             {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
           </div>
         </div>
@@ -147,7 +172,11 @@ export const ShippingCard = ({ item, getStatusColor, view }: ShippingCardProps) 
     <HoverCard>
       <HoverCardTrigger asChild>
         <Card className="group p-6 transition-all hover:-translate-y-1 hover:shadow-lg bg-white relative animate-fade-in border-t-4 border-t-mint-500">
-          <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex justify-between items-start mb-4">
+            <Badge className={`${getStatusColor(item.status)} flex items-center gap-1.5 text-sm px-3 py-1`}>
+              <Ship className="w-4 h-4" />
+              {item.status}
+            </Badge>
             {!exists ? (
               <button
                 onClick={(e) => {
@@ -155,10 +184,10 @@ export const ShippingCard = ({ item, getStatusColor, view }: ShippingCardProps) 
                   e.stopPropagation();
                   handleSave();
                 }}
-                className="p-2 hover:bg-mint-100 rounded-full transition-colors"
-                title="Save"
+                className="opacity-0 group-hover:opacity-100 transition-opacity px-3 py-1.5 rounded-md hover:bg-mint-50 text-mint-600 text-sm flex items-center gap-1.5"
               >
-                <Save className="w-5 h-5 text-mint-600" />
+                <Save className="w-4 h-4" />
+                Save
               </button>
             ) : (
               <button
@@ -167,20 +196,16 @@ export const ShippingCard = ({ item, getStatusColor, view }: ShippingCardProps) 
                   e.stopPropagation();
                   handleUpdate();
                 }}
-                className="p-2 hover:bg-mint-100 rounded-full transition-colors"
-                title="Update"
+                className="opacity-0 group-hover:opacity-100 transition-opacity px-3 py-1.5 rounded-md hover:bg-mint-50 text-mint-600 text-sm flex items-center gap-1.5"
               >
-                <RefreshCw className="w-5 h-5 text-mint-600" />
+                <RefreshCw className="w-4 h-4" />
+                Update
               </button>
             )}
           </div>
 
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <Badge className={`${getStatusColor(item.status)} flex items-center gap-1.5 text-sm px-3 py-1`}>
-                <Ship className="w-4 h-4" />
-                {item.status}
-              </Badge>
               <span className="text-sm text-gray-500 font-mono">#{item.no}</span>
             </div>
             
