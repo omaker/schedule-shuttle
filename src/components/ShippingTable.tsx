@@ -254,6 +254,52 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
     }
   };
 
+  const renderActionButtons = (row: any, savedInDb: boolean) => (
+    <div className="fixed right-8 top-1/2 transform -translate-y-1/2 z-50 flex flex-col gap-2">
+      <Tooltip>
+        <TooltipTrigger>
+          {savedInDb ? (
+            <Badge variant="outline" className="bg-green-50 border-green-200">
+              <Check className="h-4 w-4 text-green-500 mr-1" />
+              Saved
+            </Badge>
+          ) : (
+            <Badge variant="outline" className="bg-yellow-50 border-yellow-200">
+              <X className="h-4 w-4 text-yellow-500 mr-1" />
+              Not Saved
+            </Badge>
+          )}
+        </TooltipTrigger>
+        <TooltipContent>
+          {savedInDb ? 'Click Update to modify data' : 'Click Save to store in database'}
+        </TooltipContent>
+      </Tooltip>
+      <Button
+        variant={savedInDb ? "outline" : "default"}
+        size="sm"
+        onClick={() => handleSaveRow(row)}
+        className={`
+          transition-all duration-200 shadow-sm hover:shadow-md whitespace-nowrap
+          ${savedInDb 
+            ? 'bg-white hover:bg-gray-50 text-gray-700 border-gray-200' 
+            : 'bg-mint-500 hover:bg-mint-600 text-white'}
+        `}
+      >
+        {savedInDb ? (
+          <>
+            <RefreshCw className="h-4 w-4 mr-1" />
+            Update
+          </>
+        ) : (
+          <>
+            <Save className="h-4 w-4 mr-1" />
+            Save
+          </>
+        )}
+      </Button>
+    </div>
+  );
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -261,11 +307,6 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
       </div>
     );
   }
-
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const target = e.target as HTMLDivElement;
-    setScrollPosition(target.scrollLeft);
-  };
 
   return (
     <div className="space-y-4">
@@ -280,14 +321,11 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
       </div>
 
       <div className="rounded-lg border bg-white shadow-sm">
-        <ScrollArea className="h-[600px] rounded-md" onScroll={handleScroll}>
+        <ScrollArea className="h-[600px] rounded-md">
           <div className="relative">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="bg-white w-[200px]">
-                    Status & Actions
-                  </TableHead>
                   {headers.map((header, index) => (
                     <TableHead 
                       key={index}
@@ -306,65 +344,6 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
                       key={rowIndex}
                       className="group hover:bg-gray-50 transition-colors relative"
                     >
-                      <TableCell className="w-[200px] bg-white group-hover:bg-gray-50">
-                        <div 
-                          className="flex items-center gap-2 p-2"
-                          style={{
-                            position: 'absolute',
-                            left: `${scrollPosition}px`,
-                            top: '50%',
-                            transform: 'translateY(-50%)',
-                            zIndex: 40,
-                            transition: 'left 0.1s ease-out',
-                            backgroundColor: 'white',
-                            padding: '0.5rem',
-                            borderRadius: '0.375rem',
-                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-                          }}
-                        >
-                          <Tooltip>
-                            <TooltipTrigger>
-                              {savedInDb ? (
-                                <Badge variant="outline" className="bg-green-50 border-green-200">
-                                  <Check className="h-4 w-4 text-green-500 mr-1" />
-                                  Saved
-                                </Badge>
-                              ) : (
-                                <Badge variant="outline" className="bg-yellow-50 border-yellow-200">
-                                  <X className="h-4 w-4 text-yellow-500 mr-1" />
-                                  Not Saved
-                                </Badge>
-                              )}
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              {savedInDb ? 'Click Update to modify data' : 'Click Save to store in database'}
-                            </TooltipContent>
-                          </Tooltip>
-                          <Button
-                            variant={savedInDb ? "outline" : "default"}
-                            size="sm"
-                            onClick={() => handleSaveRow(row)}
-                            className={`
-                              transition-all duration-200 shadow-sm hover:shadow-md whitespace-nowrap
-                              ${savedInDb 
-                                ? 'bg-white hover:bg-gray-50 text-gray-700 border-gray-200' 
-                                : 'bg-mint-500 hover:bg-mint-600 text-white'}
-                            `}
-                          >
-                            {savedInDb ? (
-                              <>
-                                <RefreshCw className="h-4 w-4 mr-1" />
-                                Update
-                              </>
-                            ) : (
-                              <>
-                                <Save className="h-4 w-4 mr-1" />
-                                Save
-                              </>
-                            )}
-                          </Button>
-                        </div>
-                      </TableCell>
                       {headers.map((header, colIndex) => (
                         <TableCell 
                           key={`${rowIndex}-${colIndex}`}
@@ -379,6 +358,7 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
                             : (row[header] || '-')}
                         </TableCell>
                       ))}
+                      {renderActionButtons(row, savedInDb)}
                     </TableRow>
                   );
                 })}
