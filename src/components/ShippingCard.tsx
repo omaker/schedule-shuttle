@@ -22,32 +22,24 @@ export const ShippingCard = ({ item, getStatusColor }: ShippingCardProps) => {
         const { data, error } = await supabase
           .from('shipping_schedules')
           .select()
-          .eq('id', item.id)
-          .single();
+          .eq('excel_id', item.no)
+          .maybeSingle();
 
-        if (error) {
-          if (error.code === 'PGRST116') {
-            setExists(false);
-          } else {
-            throw error;
-          }
-        } else {
-          setExists(true);
-        }
+        if (error) throw error;
+        setExists(!!data);
       } catch (error) {
         console.error('Error checking data:', error);
       }
     };
 
     checkIfExists();
-  }, [item.id]);
+  }, [item.no]);
 
   const handleSave = async () => {
     try {
       const { error } = await supabase
         .from('shipping_schedules')
         .insert({
-          id: item.id,
           excel_id: item.no,
           product: item.jenisBarang,
           loading_status: item.status,
@@ -77,11 +69,18 @@ export const ShippingCard = ({ item, getStatusColor }: ShippingCardProps) => {
 
   const handleUpdate = async () => {
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('shipping_schedules')
-        .select()
-        .eq('id', item.id)
-        .single();
+        .update({
+          product: item.jenisBarang,
+          loading_status: item.status,
+          plan_qty: item.berat,
+          laycan_start: item.tanggalPengiriman,
+          company: item.namaPengirim,
+          terminal: item.alamatPengirim,
+          country: item.alamatPenerima
+        })
+        .eq('excel_id', item.no);
 
       if (error) throw error;
 
