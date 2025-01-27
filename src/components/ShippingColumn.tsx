@@ -24,7 +24,7 @@ export const ShippingColumn = ({ columnId, title, items, getStatusColor }: Shipp
             }`}
           >
             <ScrollArea className="h-[700px]">
-              <div className="space-y-2 p-1">
+              <div className="space-y-4 p-2">
                 {items.map((item, index) => (
                   <Draggable key={item.id} draggableId={item.id} index={index}>
                     {(provided, snapshot) => (
@@ -34,7 +34,11 @@ export const ShippingColumn = ({ columnId, title, items, getStatusColor }: Shipp
                         {...provided.dragHandleProps}
                         className={snapshot.isDragging ? "rotate-2 scale-105" : ""}
                       >
-                        <ShippingCard item={item} getStatusColor={getStatusColor} />
+                        <ShippingCard 
+                          item={item} 
+                          getStatusColor={getStatusColor} 
+                          view="grid"
+                        />
                       </div>
                     )}
                   </Draggable>
