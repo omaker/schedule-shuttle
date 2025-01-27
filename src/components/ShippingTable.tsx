@@ -22,7 +22,6 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
   const tableRef = useRef<HTMLDivElement>(null);
-  const [scrollPosition, setScrollPosition] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -254,52 +253,6 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
     }
   };
 
-  const renderActionButtons = (row: any, savedInDb: boolean) => (
-    <div className="fixed right-8 z-50 flex flex-col gap-2 bg-white p-2 rounded-lg shadow-lg border border-gray-100">
-      <Tooltip>
-        <TooltipTrigger>
-          {savedInDb ? (
-            <Badge variant="outline" className="bg-green-50 border-green-200">
-              <Check className="h-4 w-4 text-green-500 mr-1" />
-              Saved
-            </Badge>
-          ) : (
-            <Badge variant="outline" className="bg-yellow-50 border-yellow-200">
-              <X className="h-4 w-4 text-yellow-500 mr-1" />
-              Not Saved
-            </Badge>
-          )}
-        </TooltipTrigger>
-        <TooltipContent>
-          {savedInDb ? 'Click Update to modify data' : 'Click Save to store in database'}
-        </TooltipContent>
-      </Tooltip>
-      <Button
-        variant={savedInDb ? "outline" : "default"}
-        size="sm"
-        onClick={() => handleSaveRow(row)}
-        className={`
-          transition-all duration-200 shadow-sm hover:shadow-md whitespace-nowrap
-          ${savedInDb 
-            ? 'bg-white hover:bg-gray-50 text-gray-700 border-gray-200' 
-            : 'bg-mint-500 hover:bg-mint-600 text-white'}
-        `}
-      >
-        {savedInDb ? (
-          <>
-            <RefreshCw className="h-4 w-4 mr-1" />
-            Update
-          </>
-        ) : (
-          <>
-            <Save className="h-4 w-4 mr-1" />
-            Save
-          </>
-        )}
-      </Button>
-    </div>
-  );
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -320,12 +273,15 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
         />
       </div>
 
-      <div className="rounded-lg border bg-white shadow-sm">
-        <ScrollArea className="h-[600px] rounded-md">
-          <div className="relative">
+      <div className="rounded-lg border bg-white shadow-sm overflow-hidden">
+        <ScrollArea className="h-[600px] relative">
+          <div className="relative" ref={tableRef}>
             <Table>
-              <TableHeader>
+              <TableHeader className="sticky top-0 z-10 bg-white">
                 <TableRow>
+                  <TableHead className="sticky left-0 z-20 bg-white w-[200px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
+                    Status & Actions
+                  </TableHead>
                   {headers.map((header, index) => (
                     <TableHead 
                       key={index}
@@ -344,23 +300,71 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
                       key={rowIndex}
                       className="group hover:bg-gray-50 transition-colors relative"
                     >
-                      {headers.map((header, colIndex) => (
-                        <TableCell 
-                          key={`${rowIndex}-${colIndex}`}
-                          className={`whitespace-nowrap py-4 px-4 text-sm ${
-                            !['Laycan Status', 'LC&CSA STATUS', 'Loading Status', 'Sales Status'].includes(header) && !isNaN(row[header]) && row[header] !== "" 
-                              ? 'text-right font-mono' 
-                              : 'text-left'
-                          }`}
-                        >
-                          {['Laycan Status', 'LC&CSA STATUS', 'Loading Status', 'Sales Status'].includes(header) 
-                            ? renderStatusCell(row[header]) 
-                            : (row[header] || '-')}
-                        </TableCell>
-                      ))}
-                      <div className="absolute right-8 top-1/2 transform -translate-y-1/2">
-                        {renderActionButtons(row, savedInDb)}
-                      </div>
+                      <TableCell className="sticky left-0 z-10 bg-white group-hover:bg-gray-50 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] w-[200px]">
+                        <div className="flex items-center gap-2 p-2">
+                          <Tooltip>
+                            <TooltipTrigger>
+                              {savedInDb ? (
+                                <Badge variant="outline" className="bg-green-50 border-green-200">
+                                  <Check className="h-4 w-4 text-green-500 mr-1" />
+                                  Saved
+                                </Badge>
+                              ) : (
+                                <Badge variant="outline" className="bg-yellow-50 border-yellow-200">
+                                  <X className="h-4 w-4 text-yellow-500 mr-1" />
+                                  Not Saved
+                                </Badge>
+                              )}
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              {savedInDb ? 'Click Update to modify data' : 'Click Save to store in database'}
+                            </TooltipContent>
+                          </Tooltip>
+                          <Button
+                            variant={savedInDb ? "outline" : "default"}
+                            size="sm"
+                            onClick={() => handleSaveRow(row)}
+                            className={`
+                              transition-all duration-200 shadow-sm hover:shadow-md
+                              ${savedInDb 
+                                ? 'bg-white hover:bg-gray-50 text-gray-700 border-gray-200' 
+                                : 'bg-mint-500 hover:bg-mint-600 text-white'}
+                            `}
+                          >
+                            {savedInDb ? (
+                              <>
+                                <RefreshCw className="h-4 w-4 mr-1" />
+                                Update
+                              </>
+                            ) : (
+                              <>
+                                <Save className="h-4 w-4 mr-1" />
+                                Save
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      </TableCell>
+                      {headers.map((header, colIndex) => {
+                        const value = row[header];
+                        const isStatusColumn = [
+                          'Laycan Status',
+                          'LC&CSA STATUS',
+                          'Loading Status',
+                          'Sales Status'
+                        ].includes(header);
+                        
+                        return (
+                          <TableCell 
+                            key={`${rowIndex}-${colIndex}`}
+                            className={`whitespace-nowrap py-4 px-4 text-sm ${
+                              !isStatusColumn && !isNaN(value) && value !== "" ? 'text-right font-mono' : 'text-left'
+                            }`}
+                          >
+                            {isStatusColumn ? renderStatusCell(value) : (value || '-')}
+                          </TableCell>
+                        );
+                      })}
                     </TableRow>
                   );
                 })}
