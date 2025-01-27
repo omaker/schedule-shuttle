@@ -3,11 +3,12 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
-import { Search, Save, Loader2 } from "lucide-react";
+import { Search, Save, Loader2, Check, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Database } from "@/integrations/supabase/types";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 type ShippingSchedule = Database['public']['Tables']['shipping_schedules']['Insert'];
 
@@ -76,26 +77,30 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
     )
   );
 
+  // Check if a row exists in the database
+  const isRowInDatabase = (row: any) => {
+    return dbData.some(dbRow => dbRow.excel_id === row["EXCEL ID"]);
+  };
+
   const getStatusColor = (status: string) => {
     switch (status?.toLowerCase()) {
       case 'complete':
         return 'bg-green-100 text-green-800';
       case 'in progress':
-      case 'otw': // Added OTW status
+      case 'otw':
         return 'bg-blue-100 text-blue-800';
       case 'pending':
-      case 'not ok': // Added NOT OK status
+      case 'not ok':
         return 'bg-yellow-100 text-yellow-800';
-      case 'ok': // Added OK status
+      case 'ok':
         return 'bg-green-100 text-green-800';
-      case 'unsold': // Added Unsold status
+      case 'unsold':
         return 'bg-red-100 text-red-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
   };
 
-  // Function to render status cell with badge
   const renderStatusCell = (value: string) => (
     <Badge className={getStatusColor(value)}>
       {value || 'No Status'}
@@ -290,8 +295,8 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
             <Table>
               <TableHeader className="sticky top-0 z-10 bg-white shadow-sm">
                 <TableRow>
-                  <TableHead className="sticky left-0 z-20 bg-white min-w-[100px]">
-                    Actions
+                  <TableHead className="sticky left-0 z-20 bg-white min-w-[150px]">
+                    Status & Actions
                   </TableHead>
                   {headers.map((header, index) => (
                     <TableHead 
@@ -304,44 +309,68 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredData.map((row, rowIndex) => (
-                  <TableRow 
-                    key={rowIndex}
-                    className="hover:bg-gray-50 transition-colors"
-                  >
-                    <TableCell className="sticky left-0 z-10 bg-white shadow-sm">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full"
-                        onClick={() => handleSaveRow(row)}
-                      >
-                        <Save className="h-4 w-4 mr-1" />
-                        Save
-                      </Button>
-                    </TableCell>
-                    {headers.map((header, colIndex) => {
-                      const value = row[header];
-                      const isStatusColumn = [
-                        'Laycan Status',
-                        'LC&CSA STATUS',
-                        'Loading Status',
-                        'Sales Status'
-                      ].includes(header);
-                      
-                      return (
-                        <TableCell 
-                          key={`${rowIndex}-${colIndex}`}
-                          className={`whitespace-nowrap py-4 px-4 text-sm ${
-                            !isStatusColumn && !isNaN(value) && value !== "" ? 'text-right font-mono' : 'text-left'
-                          }`}
-                        >
-                          {isStatusColumn ? renderStatusCell(value) : (value || '-')}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                ))}
+                {filteredData.map((row, rowIndex) => {
+                  const savedInDb = isRowInDatabase(row);
+                  return (
+                    <TableRow 
+                      key={rowIndex}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
+                      <TableCell className="sticky left-0 z-10 bg-white shadow-sm">
+                        <div className="flex items-center gap-2">
+                          <Tooltip>
+                            <TooltipTrigger>
+                              {savedInDb ? (
+                                <Badge variant="outline" className="bg-green-50 border-green-200">
+                                  <Check className="h-4 w-4 text-green-500 mr-1" />
+                                  Saved
+                                </Badge>
+                              ) : (
+                                <Badge variant="outline" className="bg-yellow-50 border-yellow-200">
+                                  <X className="h-4 w-4 text-yellow-500 mr-1" />
+                                  Not Saved
+                                </Badge>
+                              )}
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              {savedInDb ? 'Data is saved in database' : 'Click Save to store in database'}
+                            </TooltipContent>
+                          </Tooltip>
+                          {!savedInDb && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleSaveRow(row)}
+                            >
+                              <Save className="h-4 w-4 mr-1" />
+                              Save
+                            </Button>
+                          )}
+                        </div>
+                      </TableCell>
+                      {headers.map((header, colIndex) => {
+                        const value = row[header];
+                        const isStatusColumn = [
+                          'Laycan Status',
+                          'LC&CSA STATUS',
+                          'Loading Status',
+                          'Sales Status'
+                        ].includes(header);
+                        
+                        return (
+                          <TableCell 
+                            key={`${rowIndex}-${colIndex}`}
+                            className={`whitespace-nowrap py-4 px-4 text-sm ${
+                              !isStatusColumn && !isNaN(value) && value !== "" ? 'text-right font-mono' : 'text-left'
+                            }`}
+                          >
+                            {isStatusColumn ? renderStatusCell(value) : (value || '-')}
+                          </TableCell>
+                        );
+                      })}
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </div>
