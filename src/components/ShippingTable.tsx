@@ -78,6 +78,7 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
   }
 
   const mapRowToShippingItem = (row: any) => ({
+    id: row["EXCEL ID"] || row.id || crypto.randomUUID(), // Add id field, fallback to random UUID if neither exists
     no: row["EXCEL ID"] || "",
     status: row["Loading Status"] || "Pending",
     jenisBarang: row["Product"] || "Unknown",
