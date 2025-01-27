@@ -1,15 +1,13 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { Table, TableBody } from "@/components/ui/table";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Search, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Database } from "@/integrations/supabase/types";
-import { Badge } from "@/components/ui/badge";
 import { ActionButtons } from "./ActionButtons";
-
-type ShippingSchedule = Database['public']['Tables']['shipping_schedules']['Insert'];
+import { ShippingHeader } from "./shipping/ShippingHeader";
+import { ShippingRow } from "./shipping/ShippingRow";
 
 interface ShippingTableProps {
   data: any[];
@@ -20,6 +18,27 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
   const [dbData, setDbData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+  const mainTableRef = useRef<HTMLDivElement>(null);
+  const actionTableRef = useRef<HTMLDivElement>(null);
+
+  const headers = [
+    "EXCEL ID", "Year", "Month", "Fin Month", "Product", "Laycan Status", "First ETA", "Vessel", "Company",
+    "Laycan Start", "Laycan Stop", "ETA", "Commence", "ATC", "Terminal", "L/R", "Dem Rate", "Plan Qty",
+    "Progress", "Act Qty", "LC MIN", "LC MAX", "Remark", "Est Des/(Dem)", "LC&CSA STATUS", "Total Qty",
+    "Laydays", "Arrival", "Laytime Start", "Laytime Stop", "Act L/R", "Loading Status", "complete",
+    "Laycan Part", "Laycan Period", "Ship Code", "Sales Status", "DY", "Incoterm",
+    "Contract Period", "Direct / AIS", "Ship Code OMDB", "Country", "Sector", "Base Customer",
+    "Region", "Price Code", "Fixed/Index Linked", "Pricing Period", "Barge Adj",
+    "Settled/Floating", "Price (FOB Vessel)", "Price Adj Load Port", "Price Adj Load Port and CV",
+    "Price FOB Vessel Adj CV", "Revenue", "Revenue Adj to Loadport", "Revenue adj to load port and CV",
+    "Revenue FOB Vessel and CV", "CV Typical", "CV Rejection", "CV Acceptable",
+    "Blending Proportion", "BC IUP", "BC Tonnage", "AI Tonnage", "BC CV", "AI CV", "Expected blended CV",
+    "CV Typical x tonnage", "CV Rejection x tonnage", "CV Acceptable x tonnage", "PIT",
+    "Product Marketing", "Price code non-capped", "Price non-capped",
+    "Price non-capped Adj LP CV Acc", "Revenue non-capped Adj LP CV Acc", "CV AR", "TM", "TS ADB",
+    "ASH AR", "HPB Cap", "HBA 2", "HPB Market", "BLU Tarif", "Pungutan BLU", "Revenue Capped",
+    "Revenue Non-Capped", "Incremental Revenue", "Net BLU Expense/(Income)"
+  ];
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,25 +68,6 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
     fetchData();
   }, [toast]);
 
-  const headers = [
-    "EXCEL ID", "Year", "Month", "Fin Month", "Product", "Laycan Status", "First ETA", "Vessel", "Company",
-    "Laycan Start", "Laycan Stop", "ETA", "Commence", "ATC", "Terminal", "L/R", "Dem Rate", "Plan Qty",
-    "Progress", "Act Qty", "LC MIN", "LC MAX", "Remark", "Est Des/(Dem)", "LC&CSA STATUS", "Total Qty",
-    "Laydays", "Arrival", "Laytime Start", "Laytime Stop", "Act L/R", "Loading Status", "complete",
-    "Laycan Part", "Laycan Period", "Ship Code", "Sales Status", "DY", "Incoterm",
-    "Contract Period", "Direct / AIS", "Ship Code OMDB", "Country", "Sector", "Base Customer",
-    "Region", "Price Code", "Fixed/Index Linked", "Pricing Period", "Barge Adj",
-    "Settled/Floating", "Price (FOB Vessel)", "Price Adj Load Port", "Price Adj Load Port and CV",
-    "Price FOB Vessel Adj CV", "Revenue", "Revenue Adj to Loadport", "Revenue adj to load port and CV",
-    "Revenue FOB Vessel and CV", "CV Typical", "CV Rejection", "CV Acceptable",
-    "Blending Proportion", "BC IUP", "BC Tonnage", "AI Tonnage", "BC CV", "AI CV", "Expected blended CV",
-    "CV Typical x tonnage", "CV Rejection x tonnage", "CV Acceptable x tonnage", "PIT",
-    "Product Marketing", "Price code non-capped", "Price non-capped",
-    "Price non-capped Adj LP CV Acc", "Revenue non-capped Adj LP CV Acc", "CV AR", "TM", "TS ADB",
-    "ASH AR", "HPB Cap", "HBA 2", "HPB Market", "BLU Tarif", "Pungutan BLU", "Revenue Capped",
-    "Revenue Non-Capped", "Incremental Revenue", "Net BLU Expense/(Income)"
-  ];
-
   const filteredData = data.filter(row => 
     Object.values(row).some(value => 
       value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
@@ -77,31 +77,6 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
   const isRowInDatabase = (row: any) => {
     return dbData.some(dbRow => dbRow.excel_id === row["EXCEL ID"]);
   };
-
-  const getStatusColor = (status: string) => {
-    switch (status?.toLowerCase()) {
-      case 'complete':
-        return 'bg-green-100 text-green-800';
-      case 'in progress':
-      case 'otw':
-        return 'bg-blue-100 text-blue-800';
-      case 'pending':
-      case 'not ok':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'ok':
-        return 'bg-green-100 text-green-800';
-      case 'unsold':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const renderStatusCell = (value: string) => (
-    <Badge className={getStatusColor(value)}>
-      {value || 'No Status'}
-    </Badge>
-  );
 
   const handleSaveRow = async (rowData: any) => {
     try {
@@ -251,6 +226,18 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
     }
   };
 
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    if (actionTableRef.current && mainTableRef.current) {
+      actionTableRef.current.scrollTop = e.currentTarget.scrollTop;
+    }
+  };
+
+  const handleActionScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    if (mainTableRef.current && actionTableRef.current) {
+      mainTableRef.current.scrollTop = e.currentTarget.scrollTop;
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -271,12 +258,16 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
         />
       </div>
 
-      <div className="flex gap-4">
-        <div className="w-[220px]">
+      <div className="flex gap-4 max-w-full overflow-hidden">
+        <div className="w-[220px] flex-shrink-0">
           <div className="bg-white border-x border-t h-12 flex items-center px-4">
             <h3 className="text-sm font-medium text-gray-900">Action</h3>
           </div>
-          <div className="bg-white/95 border h-[600px] overflow-y-auto">
+          <div 
+            ref={actionTableRef}
+            onScroll={handleActionScroll}
+            className="bg-white/95 border h-[600px] overflow-y-auto"
+          >
             {filteredData.map((row, index) => (
               <ActionButtons
                 key={index}
@@ -288,52 +279,26 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
           </div>
         </div>
 
-        <div className="rounded-lg border bg-white shadow-sm flex-1">
+        <div className="flex-1 min-w-0">
           <ScrollArea className="h-[600px] rounded-md border">
-            <Table>
-              <TableHeader className="sticky top-0 z-10 bg-white shadow-sm">
-                <TableRow>
-                  {headers.map((header, index) => (
-                    <TableHead 
-                      key={index}
-                      className="min-w-[150px] bg-white h-12 text-left text-sm font-medium text-gray-900 hover:bg-gray-50"
-                    >
-                      {header}
-                    </TableHead>
+            <div 
+              ref={mainTableRef}
+              onScroll={handleScroll}
+              className="h-full overflow-auto"
+            >
+              <Table>
+                <ShippingHeader headers={headers} />
+                <TableBody>
+                  {filteredData.map((row) => (
+                    <ShippingRow
+                      key={row["EXCEL ID"]}
+                      row={row}
+                      headers={headers}
+                    />
                   ))}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredData.map((row, rowIndex) => (
-                  <TableRow 
-                    key={rowIndex}
-                    className="hover:bg-gray-50 transition-colors"
-                  >
-                    {headers.map((header, colIndex) => {
-                      const value = row[header];
-                      const isStatusColumn = [
-                        'Laycan Status',
-                        'LC&CSA STATUS',
-                        'Loading Status',
-                        'Sales Status'
-                      ].includes(header);
-                      
-                      return (
-                        <TableCell 
-                          key={`${rowIndex}-${colIndex}`}
-                          className={`whitespace-nowrap py-4 px-4 text-sm ${
-                            !isStatusColumn && !isNaN(value) && value !== "" ? 'text-right font-mono' : 'text-left'
-                          }`}
-                        >
-                          {isStatusColumn ? renderStatusCell(value) : (value || '-')}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            <ScrollBar orientation="horizontal" />
+                </TableBody>
+              </Table>
+            </div>
           </ScrollArea>
         </div>
       </div>
