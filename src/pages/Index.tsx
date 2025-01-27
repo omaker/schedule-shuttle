@@ -2,7 +2,7 @@ import { useState } from "react";
 import { FileUpload } from "@/components/FileUpload";
 import { ShippingTable } from "@/components/ShippingTable";
 import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
+import { Download, Upload } from "lucide-react";
 import * as XLSX from "xlsx";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -145,6 +145,20 @@ const Index = () => {
     });
   };
 
+  const handleUploadClick = () => {
+    // Trigger click on hidden file input
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.click();
+    } else {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Upload component not found",
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -175,6 +189,17 @@ const Index = () => {
         </div>
 
         <div className="space-y-8">
+          <div className="flex justify-end mb-4">
+            <Button
+              onClick={handleUploadClick}
+              variant="default"
+              className="bg-mint-500 hover:bg-mint-600"
+            >
+              <Upload className="mr-2" />
+              Upload Excel
+            </Button>
+          </div>
+          
           <FileUpload onDataReceived={setShippingData} />
           
           {shippingData.length > 0 && (
