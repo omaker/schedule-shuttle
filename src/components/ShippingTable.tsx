@@ -1,7 +1,7 @@
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
-import { Search, Loader2, Filter } from "lucide-react";
+import { Search, Loader2, Filter, LayoutGrid, List } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ShippingCard } from "./ShippingCard";
@@ -93,8 +93,8 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
   });
 
   return (
-    <div className="space-y-6 bg-gray-50 p-8 rounded-lg shadow-sm">
-      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+    <div className="space-y-6 bg-gradient-to-br from-gray-50 to-mint-50 p-8 rounded-xl shadow-sm">
+      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-white p-4 rounded-lg shadow-sm">
         <div className="relative w-full max-w-md">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
           <Input
@@ -108,26 +108,28 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
           <Button
             variant={view === "grid" ? "default" : "outline"}
             onClick={() => setView("grid")}
-            className="w-24"
+            className="w-28 gap-2"
           >
+            <LayoutGrid className="h-4 w-4" />
             Grid
           </Button>
           <Button
             variant={view === "compact" ? "default" : "outline"}
             onClick={() => setView("compact")}
-            className="w-24"
+            className="w-28 gap-2"
           >
+            <List className="h-4 w-4" />
             Compact
           </Button>
         </div>
       </div>
 
-      <ScrollArea className="h-[calc(100vh-14rem)] bg-transparent px-4">
+      <ScrollArea className="h-[calc(100vh-16rem)] rounded-lg bg-white/50 backdrop-blur-sm">
         <div className={`
           ${view === "grid" 
-            ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" 
+            ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6" 
             : "flex flex-col gap-4"}
-          p-4
+          p-6
         `}>
           {filteredData.map((row, index) => (
             <ShippingCard
@@ -141,7 +143,7 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
         <ScrollBar orientation="vertical" />
       </ScrollArea>
 
-      <div className="flex items-center justify-between bg-white p-4 rounded-md shadow-sm">
+      <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow-sm">
         <span className="text-sm text-gray-500">
           Showing {filteredData.length} of {data.length} entries
         </span>

@@ -21,17 +21,13 @@ export const ShippingCard = ({ item, getStatusColor, view }: ShippingCardProps) 
   useEffect(() => {
     const checkIfExists = async () => {
       try {
-        console.log("Checking existence for excel_id:", item.no);
         const { data, error } = await supabase
           .from('shipping_schedules')
           .select()
           .eq('excel_id', item.no)
           .maybeSingle();
 
-        if (error) {
-          console.error('Error checking data:', error);
-          throw error;
-        }
+        if (error) throw error;
         setExists(!!data);
       } catch (error) {
         console.error('Error checking data:', error);
@@ -106,10 +102,13 @@ export const ShippingCard = ({ item, getStatusColor, view }: ShippingCardProps) 
 
   if (view === "compact") {
     return (
-      <Card className="p-4 hover:bg-gray-50 transition-colors border-l-4 border-l-mint-500 cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
+      <Card 
+        className="p-4 hover:bg-gray-50 transition-all border-l-4 border-l-mint-500 cursor-pointer animate-fade-in" 
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Badge className={`${getStatusColor(item.status)} animate-fade-in flex items-center gap-1.5`}>
+            <Badge className={`${getStatusColor(item.status)} flex items-center gap-1.5`}>
               <Ship className="w-3 h-3" />
               {item.status}
             </Badge>
@@ -144,8 +143,8 @@ export const ShippingCard = ({ item, getStatusColor, view }: ShippingCardProps) 
   return (
     <HoverCard>
       <HoverCardTrigger asChild>
-        <Card className="p-6 transition-all transform hover:shadow-lg hover:-translate-y-1 bg-gradient-to-br from-white to-gray-50 relative min-w-[300px] border border-gray-100">
-          <div className="absolute top-4 right-4">
+        <Card className="group p-6 transition-all hover:-translate-y-1 hover:shadow-lg bg-white relative animate-fade-in border-t-4 border-t-mint-500">
+          <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
             {!exists ? (
               <button
                 onClick={(e) => {
@@ -175,7 +174,7 @@ export const ShippingCard = ({ item, getStatusColor, view }: ShippingCardProps) 
 
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <Badge className={`${getStatusColor(item.status)} animate-fade-in flex items-center gap-1.5 text-sm px-3 py-1`}>
+              <Badge className={`${getStatusColor(item.status)} flex items-center gap-1.5 text-sm px-3 py-1`}>
                 <Ship className="w-4 h-4" />
                 {item.status}
               </Badge>
@@ -205,7 +204,7 @@ export const ShippingCard = ({ item, getStatusColor, view }: ShippingCardProps) 
       <HoverCardContent className="w-80 p-4">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <Badge className={`${getStatusColor(item.status)} animate-fade-in`}>
+            <Badge className={`${getStatusColor(item.status)}`}>
               <Ship className="w-4 h-4 mr-1" />
               {item.status}
             </Badge>
