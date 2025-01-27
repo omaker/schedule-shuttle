@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ShippingItem } from "@/types/shipping";
-import { Ship, Anchor, Weight, Calendar, Save, RefreshCw, ChevronRight, ChevronDown } from "lucide-react";
+import { Ship, Anchor, Weight, Calendar, Save, RefreshCw, ChevronRight, ChevronDown, Package } from "lucide-react";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -112,7 +112,10 @@ export const ShippingCard = ({ item, getStatusColor, view }: ShippingCardProps) 
               <Ship className="w-3 h-3" />
               {item.status}
             </Badge>
-            <span className="text-sm font-medium text-mint-800">{item.jenisBarang}</span>
+            <div className="flex items-center gap-2">
+              <Package className="w-4 h-4 text-mint-600" />
+              <span className="text-sm font-medium text-mint-800">{item.jenisBarang}</span>
+            </div>
           </div>
           <div className="flex items-center gap-4">
             <span className="text-sm text-gray-500">{item.berat} ton</span>
@@ -184,7 +187,7 @@ export const ShippingCard = ({ item, getStatusColor, view }: ShippingCardProps) 
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-mint-800">
-                  <Anchor className="w-4 h-4" />
+                  <Package className="w-4 h-4 text-mint-600" />
                   <p className="text-base font-medium truncate max-w-[200px]">{item.jenisBarang}</p>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-gray-600">
@@ -213,7 +216,7 @@ export const ShippingCard = ({ item, getStatusColor, view }: ShippingCardProps) 
           
           <div className="space-y-1">
             <h4 className="font-semibold text-mint-800 flex items-center gap-2">
-              <Anchor className="w-4 h-4" />
+              <Package className="w-4 h-4" />
               {item.jenisBarang}
             </h4>
             <p className="text-sm flex items-center gap-2">
