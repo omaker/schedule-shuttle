@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ActionButtons } from "./ActionButtons";
 import { ShippingHeader } from "./shipping/ShippingHeader";
 import { ShippingRow } from "./shipping/ShippingRow";
+import { ShippingSchedule } from "@/types/shipping-types";
 
 interface ShippingTableProps {
   data: any[];
