@@ -29,9 +29,133 @@ export const FileUpload = ({ onDataReceived }: FileUploadProps) => {
           range.s.r = 6; // Start from row 7 (0-based index)
           worksheet["!ref"] = XLSX.utils.encode_range(range);
           
-          const jsonData = XLSX.utils.sheet_to_json(worksheet);
+          // Convert Excel column letters to our header names
+          const excelData = XLSX.utils.sheet_to_json(worksheet, { header: "A" });
+          
+          const columnMapping: { [key: string]: string } = {
+            "B": "EXCEL ID",
+            "C": "Year",
+            "D": "Month",
+            "E": "Fin Month",
+            "F": "Product",
+            "G": "Laycan Status",
+            "H": "First ETA",
+            "I": "Vessel",
+            "J": "Company",
+            "K": "Laycan Start",
+            "L": "Laycan Stop",
+            "M": "ETA",
+            "N": "Commence",
+            "O": "ATC",
+            "P": "Terminal",
+            "Q": "L/R",
+            "R": "Dem Rate",
+            "S": "Plan Qty",
+            "T": "Progress",
+            "U": "Act Qty",
+            "V": "LC MIN",
+            "W": "LC MAX",
+            "X": "Remark",
+            "Y": "Est Des/(Dem)",
+            "Z": "LC&CSA STATUS",
+            "AA": "Total Qty",
+            "AB": "Laydays",
+            "AC": "Arrival",
+            "AD": "Laytime Start",
+            "AE": "Laytime Stop",
+            "AF": "Act L/R",
+            "AG": "Loading Status",
+            "AH": "complete",
+            "AI": "Laycan Part",
+            "AJ": "Laycan Period",
+            "AK": "a",
+            "AL": "b",
+            "AM": "Ship Code",
+            "AN": "Sales Status",
+            "AO": "DY",
+            "AP": "Incoterm",
+            "AQ": "Contract Period",
+            "AR": "Direct / AIS",
+            "AS": "Ship Code OMDB",
+            "AT": "c",
+            "AU": "d",
+            "AV": "Country",
+            "AW": "Sector",
+            "AX": "Base Customer",
+            "AY": "Region",
+            "AZ": "e",
+            "BA": "f",
+            "BB": "Price Code",
+            "BC": "Fixed/Index Linked",
+            "BD": "Pricing Period",
+            "BE": "Barge Adj",
+            "BF": "Settled/Floating",
+            "BG": "Price (FOB Vessel)",
+            "BH": "Price Adj Load Port",
+            "BI": "Price Adj Load Port and CV",
+            "BJ": "Price FOB Vessel Adj CV",
+            "BK": "Revenue",
+            "BL": "Revenue Adj to Loadport",
+            "BM": "Revenue adj to load port and CV",
+            "BN": "Revenue FOB Vessel and CV",
+            "BO": "g",
+            "BP": "h",
+            "BQ": "CV Typical",
+            "BR": "CV Rejection",
+            "BS": "CV Acceptable",
+            "BT": "Blending Proportion",
+            "BU": "BC IUP",
+            "BV": "BC Tonnage",
+            "BW": "AI Tonnage",
+            "BX": "BC CV",
+            "BY": "AI CV",
+            "BZ": "Expected blended CV",
+            "CA": "CV Typical x tonnage",
+            "CB": "CV Rejection x tonnage",
+            "CC": "CV Acceptable x tonnage",
+            "CD": "PIT",
+            "CE": "Product Marketing",
+            "CF": "i",
+            "CG": "j",
+            "CH": "Price code non-capped",
+            "CI": "Price non-capped",
+            "CJ": "Price non-capped Adj LP CV Acc",
+            "CK": "Revenue non-capped Adj LP CV Acc",
+            "CL": "CV AR",
+            "CM": "TM",
+            "CN": "TS ADB",
+            "CO": "ASH AR",
+            "CP": "HPB Cap",
+            "CQ": "HBA 2",
+            "CR": "HPB Market",
+            "CS": "BLU Tarif",
+            "CT": "Pungutan BLU",
+            "CU": "Revenue Capped",
+            "CV": "Revenue Non-Capped",
+            "CW": "Incremental Revenue",
+            "CX": "Net BLU Expense/(Income)",
+            "CY": "k",
+            "CZ": "l",
+            "DA": "m",
+            "DB": "n",
+            "DC": "o",
+            "DD": "p",
+            "DE": "q",
+            "DF": "r",
+            "DG": "s"
+          };
 
-          if (jsonData.length === 0) {
+          const mappedData = excelData.map((row: any) => {
+            const newRow: any = {};
+            Object.entries(row).forEach(([key, value]) => {
+              if (columnMapping[key]) {
+                newRow[columnMapping[key]] = value;
+              }
+            });
+            return newRow;
+          });
+
+          if (mappedData.length === 0) {
             toast({
               variant: "destructive",
               title: "Error",
@@ -40,10 +164,11 @@ export const FileUpload = ({ onDataReceived }: FileUploadProps) => {
             return;
           }
 
-          onDataReceived(jsonData);
+          console.log("Mapped data:", mappedData); // Debug log
+          onDataReceived(mappedData);
           toast({
             title: "File berhasil diupload",
-            description: `${jsonData.length} data berhasil diimport`,
+            description: `${mappedData.length} data berhasil diimport`,
           });
         } catch (error) {
           console.error("Error processing file:", error);
