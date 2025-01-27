@@ -2,7 +2,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Search, Save, Loader2, Check, X, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,6 +21,7 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
   const [dbData, setDbData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+  const tableRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -272,19 +273,19 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
         />
       </div>
 
-      <div className="rounded-lg border bg-white shadow-sm">
-        <ScrollArea className="h-[600px] rounded-md border">
-          <div className="relative">
+      <div className="rounded-lg border bg-white shadow-sm overflow-hidden">
+        <ScrollArea className="h-[600px] relative">
+          <div className="relative" ref={tableRef}>
             <Table>
-              <TableHeader className="sticky top-0 z-10 bg-white shadow-sm">
+              <TableHeader className="sticky top-0 z-10 bg-white">
                 <TableRow>
-                  <TableHead className="sticky left-0 z-20 bg-white min-w-[180px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
+                  <TableHead className="sticky left-0 z-20 bg-white w-[200px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
                     Status & Actions
                   </TableHead>
                   {headers.map((header, index) => (
                     <TableHead 
                       key={index}
-                      className="min-w-[150px] bg-white py-4 text-left text-sm font-medium text-gray-900 hover:bg-gray-50"
+                      className="min-w-[150px] bg-white py-4 text-left text-sm font-medium text-gray-900"
                     >
                       {header}
                     </TableHead>
@@ -297,10 +298,10 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
                   return (
                     <TableRow 
                       key={rowIndex}
-                      className="hover:bg-gray-50 transition-colors"
+                      className="group hover:bg-gray-50 transition-colors relative"
                     >
-                      <TableCell className="sticky left-0 z-10 bg-white shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] p-2">
-                        <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-lg p-2">
+                      <TableCell className="sticky left-0 z-10 bg-white group-hover:bg-gray-50 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] w-[200px]">
+                        <div className="flex items-center gap-2 p-2">
                           <Tooltip>
                             <TooltipTrigger>
                               {savedInDb ? (
