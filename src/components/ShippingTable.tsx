@@ -89,7 +89,16 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
     namaPengirim: row["Company"] || "Tidak ada data",
     alamatPengirim: row["Terminal"] || "Tidak ada data",
     namaPenerima: row["Base Customer"] || "Tidak ada data",
-    alamatPenerima: row["Country"] || "Tidak ada data"
+    alamatPenerima: row["Country"] || "Tidak ada data",
+    year: row["Year"] || "Tidak ada data",
+    month: row["Month"] || "Tidak ada data",
+    finMonth: row["Fin Month"] || "Tidak ada data",
+    vessel: row["Vessel"] || "Tidak ada data",
+    shipCode: row["Ship Code"] || "Tidak ada data",
+    region: row["Region"] || "Tidak ada data",
+    terminal: row["Terminal"] || "Tidak ada data",
+    contractPeriod: row["Contract Period"] || "Tidak ada data",
+    priceCode: row["Price Code"] || "Tidak ada data"
   });
 
   return (
