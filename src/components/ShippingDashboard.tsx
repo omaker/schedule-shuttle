@@ -300,6 +300,7 @@ export const ShippingDashboard = () => {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead>Excel ID</TableHead>
                   <TableHead>Product</TableHead>
                   <TableHead>Company</TableHead>
                   <TableHead>Terminal</TableHead>
@@ -312,7 +313,8 @@ export const ShippingDashboard = () => {
               <TableBody>
                 {currentData.map((shipment, index) => (
                   <TableRow key={index}>
-                    <TableCell className="font-medium">{shipment.product || 'N/A'}</TableCell>
+                    <TableCell className="font-medium">{shipment.excel_id || 'N/A'}</TableCell>
+                    <TableCell>{shipment.product || 'N/A'}</TableCell>
                     <TableCell>{shipment.company || 'N/A'}</TableCell>
                     <TableCell>{shipment.terminal || 'N/A'}</TableCell>
                     <TableCell>{shipment.plan_qty?.toLocaleString() || '0'}</TableCell>
