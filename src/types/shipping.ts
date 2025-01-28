@@ -9,7 +9,6 @@ export interface ShippingItem {
   alamatPengirim: string;
   namaPenerima: string;
   alamatPenerima: string;
-  // Adding the missing properties
   year?: string | number;
   month?: string | number;
   finMonth?: string | number;
@@ -19,6 +18,11 @@ export interface ShippingItem {
   terminal?: string;
   contractPeriod?: string;
   priceCode?: string;
+  // Adding the new properties
+  price_fob_vessel?: number;
+  revenue?: number;
+  cv_typical?: number;
+  cv_acceptable?: number;
 }
 
 export interface Column {

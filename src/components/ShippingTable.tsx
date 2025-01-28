@@ -98,7 +98,12 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
     region: row["Region"] || "Tidak ada data",
     terminal: row["Terminal"] || "Tidak ada data",
     contractPeriod: row["Contract Period"] || "Tidak ada data",
-    priceCode: row["Price Code"] || "Tidak ada data"
+    priceCode: row["Price Code"] || "Tidak ada data",
+    // Adding the new properties
+    price_fob_vessel: row["Price FOB Vessel"] || null,
+    revenue: row["Revenue"] || null,
+    cv_typical: row["CV Typical"] || null,
+    cv_acceptable: row["CV Acceptable"] || null
   });
 
   return (
