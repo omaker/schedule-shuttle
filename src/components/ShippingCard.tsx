@@ -3,27 +3,24 @@ import { Badge } from "@/components/ui/badge";
 import { ShippingItem } from "@/types/shipping";
 import { 
   Ship, Weight, Calendar, Save, RefreshCw, ChevronRight, ChevronDown, 
-  Package, Building, MapPin, Rocket, ArrowUpRight, Edit, Trash
+  Package, Building, MapPin, Rocket, ArrowUpRight
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { EditShippingModal } from "./EditShippingModal";
 
 interface ShippingCardProps {
   item: ShippingItem;
   getStatusColor: (status: string) => string;
   view: "grid" | "compact";
-  onDelete?: () => void;
-  onUpdate?: () => void;
 }
 
-export const ShippingCard = ({ item, getStatusColor, view, onDelete, onUpdate }: ShippingCardProps) => {
+export const ShippingCard = ({ item, getStatusColor, view }: ShippingCardProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [exists, setExists] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
     const checkIfExists = async () => {
@@ -107,34 +104,16 @@ export const ShippingCard = ({ item, getStatusColor, view, onDelete, onUpdate }:
     }
   };
 
-  const handleDelete = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    try {
-      const { error } = await supabase
-        .from('shipping_schedules')
-        .delete()
-        .eq('excel_id', item.no);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Shipping record deleted successfully",
-      });
-      onDelete?.();
-    } catch (error) {
-      console.error('Error deleting record:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to delete shipping record",
-      });
-    }
+  const handleCardClick = () => {
+    navigate(`/shipping/${item.no}`);
   };
 
   if (view === "compact") {
     return (
-      <Card className="relative group cursor-pointer overflow-hidden">
+      <Card 
+        className="relative group cursor-pointer overflow-hidden"
+        onClick={() => navigate(`/shipping/${item.no}`)}
+      >
         <div className="p-3 space-y-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5">
@@ -186,40 +165,25 @@ export const ShippingCard = ({ item, getStatusColor, view, onDelete, onUpdate }:
                 Save
               </button>
             ) : (
-              <>
-                <button
-                  onClick={(e) => { e.stopPropagation(); setIsEditModalOpen(true); }}
-                  className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 hover:bg-primary/20 transition-colors flex items-center gap-1"
-                >
-                  <Edit className="w-2.5 h-2.5" />
-                  Edit
-                </button>
-                <button
-                  onClick={handleDelete}
-                  className="text-[10px] px-1.5 py-0.5 rounded bg-destructive/10 hover:bg-destructive/20 transition-colors text-destructive flex items-center gap-1"
-                >
-                  <Trash className="w-2.5 h-2.5" />
-                  Delete
-                </button>
-              </>
+              <button
+                onClick={(e) => { e.stopPropagation(); handleUpdate(); }}
+                className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 hover:bg-primary/20 transition-colors flex items-center gap-1"
+              >
+                <RefreshCw className="w-2.5 h-2.5" />
+                Update
+              </button>
             )}
           </div>
         </div>
-        <EditShippingModal
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          item={item}
-          onUpdate={() => {
-            onUpdate?.();
-            setIsEditModalOpen(false);
-          }}
-        />
       </Card>
     );
   }
 
   return (
-    <Card className="relative group cursor-pointer overflow-hidden h-full">
+    <Card 
+      className="relative group cursor-pointer overflow-hidden h-full"
+      onClick={handleCardClick}
+    >
       <div className="p-4 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
@@ -284,34 +248,16 @@ export const ShippingCard = ({ item, getStatusColor, view, onDelete, onUpdate }:
               Save to Database
             </button>
           ) : (
-            <>
-              <button
-                onClick={(e) => { e.stopPropagation(); setIsEditModalOpen(true); }}
-                className="text-xs px-2 py-1 rounded-md bg-primary/10 hover:bg-primary/20 transition-colors flex items-center gap-1.5"
-              >
-                <Edit className="w-3 h-3" />
-                Edit
-              </button>
-              <button
-                onClick={handleDelete}
-                className="text-xs px-2 py-1 rounded-md bg-destructive/10 hover:bg-destructive/20 transition-colors text-destructive flex items-center gap-1.5"
-              >
-                <Trash className="w-3 h-3" />
-                Delete
-              </button>
-            </>
+            <button
+              onClick={(e) => { e.stopPropagation(); handleUpdate(); }}
+              className="text-xs px-2 py-1 rounded-md bg-primary/10 hover:bg-primary/20 transition-colors flex items-center gap-1.5"
+            >
+              <RefreshCw className="w-3 h-3" />
+              Update Data
+            </button>
           )}
         </div>
       </div>
-      <EditShippingModal
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        item={item}
-        onUpdate={() => {
-          onUpdate?.();
-          setIsEditModalOpen(false);
-        }}
-      />
     </Card>
   );
 };
