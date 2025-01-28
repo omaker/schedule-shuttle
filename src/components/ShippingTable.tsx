@@ -9,9 +9,10 @@ import { Button } from "@/components/ui/button";
 
 interface ShippingTableProps {
   data: any[];
+  showCombinedData?: boolean;
 }
 
-export const ShippingTable = ({ data }: ShippingTableProps) => {
+export const ShippingTable = ({ data, showCombinedData = false }: ShippingTableProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [dbData, setDbData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -46,10 +47,10 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
     fetchData();
   }, [toast]);
 
-  // Combine database data with uploaded Excel data
-  const combinedData = [...dbData, ...data];
+  // Use either combined data or just database data based on showCombinedData prop
+  const displayData = showCombinedData ? [...dbData, ...data] : dbData;
 
-  const filteredData = combinedData.filter(row => 
+  const filteredData = displayData.filter(row => 
     Object.values(row).some(value => 
       value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
     )
@@ -134,7 +135,10 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
 
       <div className="flex items-center justify-between p-4 rounded-lg border bg-card">
         <span className="text-sm text-muted-foreground">
-          Showing {filteredData.length} items ({dbData.length} from database, {data.length} from Excel)
+          {showCombinedData 
+            ? `Showing ${filteredData.length} items (${dbData.length} from database, ${data.length} from Excel)`
+            : `Showing ${filteredData.length} items from database`
+          }
         </span>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Filter className="h-4 w-4" />

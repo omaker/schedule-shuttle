@@ -208,7 +208,7 @@ const Index = () => {
                       <h2 className="text-2xl font-semibold text-gray-900 mb-4">
                         Database Records
                       </h2>
-                      <ShippingTable data={[]} />
+                      <ShippingTable data={[]} showCombinedData={false} />
                     </div>
                   </div>
                 ) : (
@@ -216,7 +216,7 @@ const Index = () => {
                     <h2 className="text-2xl font-semibold text-gray-900 mb-4">
                       Combined Data
                     </h2>
-                    <ShippingTable data={shippingData} />
+                    <ShippingTable data={shippingData} showCombinedData={true} />
                   </div>
                 )}
               </TabsContent>
