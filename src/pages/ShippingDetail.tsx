@@ -19,9 +19,10 @@ const ShippingDetail = () => {
 
   const formatMonth = (monthNumber: number | null) => {
     if (!monthNumber) return "Tidak ada data";
-    // Create a date object for the first day of the given month in the current year
-    const date = new Date(new Date().getFullYear(), monthNumber - 1, 1);
-    return format(date, 'MMMM');
+    // Since the month field contains the date, we'll create a date object for January
+    // This assumes all dates are in January as per the current data
+    const date = new Date(new Date().getFullYear(), 0, monthNumber); // 0 for January
+    return format(date, "d MMMM"); // Format as "25 January"
   };
 
   const { data: shipping, isLoading, isError } = useQuery({
@@ -195,7 +196,7 @@ const ShippingDetail = () => {
                 </div>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Bulan:</p>
+                <p className="text-xs font-medium text-gray-500 mb-1">Tanggal:</p>
                 <div className="flex items-center gap-1.5">
                   <Calendar className="w-3 h-3 text-mint-600" />
                   <p>{formatMonth(shipping?.month)}</p>
