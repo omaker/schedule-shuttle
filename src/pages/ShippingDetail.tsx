@@ -3,9 +3,11 @@ import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   Ship, Package, Building, MapPin, Calendar, 
-  Weight, DollarSign, Percent, ArrowLeft 
+  Weight, DollarSign, Percent, ArrowLeft,
+  Info, Truck, Clock, FileText
 } from "lucide-react";
 import { formatShippingDate, formatFinMonth } from "@/utils/dateFormatters";
 
@@ -55,7 +57,7 @@ const ShippingDetail = () => {
           <h1 className="text-2xl font-bold text-gray-900 mb-4">
             Error loading shipping details
           </h1>
-          <Button onClick={() => navigate("/")} variant="outline">
+          <Button onClick={() => navigate(-1)} variant="outline">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Home
           </Button>
@@ -66,9 +68,9 @@ const ShippingDetail = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-mint-50 to-mint-100 py-12 px-4">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <Button
-          onClick={() => navigate("/")}
+          onClick={() => navigate(-1)}
           variant="outline"
           className="mb-6"
         >
@@ -79,128 +81,100 @@ const ShippingDetail = () => {
         {isLoading ? (
           <div className="space-y-4">
             <Skeleton className="h-8 w-64" />
-            <Skeleton className="h-64 w-full" />
+            <Skeleton className="h-[calc(100vh-200px)] w-full" />
           </div>
         ) : (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-bold text-gray-900">
-                Shipping Details #{shipping?.excel_id}
-              </h1>
-              <div
-                className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                  shipping?.loading_status
-                )}`}
-              >
-                <div className="flex items-center gap-1.5">
-                  <Ship className="w-3 h-3" />
-                  {shipping?.loading_status || "No Status"}
+          <ScrollArea className="h-[calc(100vh-150px)]">
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h1 className="text-2xl font-bold text-gray-900">
+                  Shipping Details #{shipping?.excel_id}
+                </h1>
+                <div
+                  className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                    shipping?.loading_status
+                  )}`}
+                >
+                  <div className="flex items-center gap-1.5">
+                    <Ship className="w-3 h-3" />
+                    {shipping?.loading_status || "No Status"}
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {/* Basic Information */}
+                <div className="bg-white rounded-lg shadow-sm border p-6 space-y-6">
+                  <h3 className="font-semibold flex items-center gap-2">
+                    <Info className="w-4 h-4" />
+                    Basic Information
+                  </h3>
+                  <div className="space-y-4">
+                    <InfoItem icon={Package} label="Product" value={shipping?.product} />
+                    <InfoItem icon={Calendar} label="Year" value={shipping?.year} />
+                    <InfoItem icon={Calendar} label="Month" value={formatShippingDate(shipping?.month)} />
+                    <InfoItem icon={Calendar} label="Financial Month" value={formatFinMonth(shipping?.fin_month)} />
+                    <InfoItem icon={Ship} label="Vessel" value={shipping?.vessel} />
+                    <InfoItem icon={Building} label="Company" value={shipping?.company} />
+                  </div>
+                </div>
+
+                {/* Shipping Details */}
+                <div className="bg-white rounded-lg shadow-sm border p-6 space-y-6">
+                  <h3 className="font-semibold flex items-center gap-2">
+                    <Truck className="w-4 h-4" />
+                    Shipping Details
+                  </h3>
+                  <div className="space-y-4">
+                    <InfoItem icon={MapPin} label="Terminal" value={shipping?.terminal} />
+                    <InfoItem icon={MapPin} label="Country" value={shipping?.country} />
+                    <InfoItem icon={MapPin} label="Region" value={shipping?.region} />
+                    <InfoItem icon={Weight} label="Plan Quantity" value={`${shipping?.plan_qty || 0} MT`} />
+                    <InfoItem icon={Weight} label="Total Quantity" value={`${shipping?.total_qty || 0} MT`} />
+                    <InfoItem icon={Clock} label="Laydays" value={shipping?.laydays} />
+                  </div>
+                </div>
+
+                {/* Commercial Details */}
+                <div className="bg-white rounded-lg shadow-sm border p-6 space-y-6">
+                  <h3 className="font-semibold flex items-center gap-2">
+                    <FileText className="w-4 h-4" />
+                    Commercial Details
+                  </h3>
+                  <div className="space-y-4">
+                    <InfoItem icon={DollarSign} label="Price FOB Vessel" value={shipping?.price_fob_vessel} />
+                    <InfoItem icon={DollarSign} label="Revenue" value={shipping?.revenue} />
+                    <InfoItem icon={Percent} label="CV Typical" value={shipping?.cv_typical} />
+                    <InfoItem icon={Percent} label="CV Acceptable" value={shipping?.cv_acceptable} />
+                    <InfoItem icon={Info} label="Contract Period" value={shipping?.contract_period} />
+                    <InfoItem icon={Info} label="Price Code" value={shipping?.price_code} />
+                  </div>
                 </div>
               </div>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white rounded-lg shadow-sm border p-6 space-y-6">
-                <div>
-                  <p className="text-xs font-medium text-gray-500 mb-1">
-                    Product Details:
-                  </p>
-                  <div className="flex items-center gap-1.5">
-                    <Package className="w-3 h-3 text-mint-600" />
-                    <p>{shipping?.product || "Tidak ada data"}</p>
-                  </div>
-                </div>
-
-                <div>
-                  <p className="text-xs font-medium text-gray-500 mb-1">
-                    Tanggal:
-                  </p>
-                  <div className="flex items-center gap-1.5">
-                    <Calendar className="w-3 h-3 text-mint-600" />
-                    <p>{formatShippingDate(shipping?.month)}</p>
-                  </div>
-                </div>
-
-                <div>
-                  <p className="text-xs font-medium text-gray-500 mb-1">
-                    Financial Month:
-                  </p>
-                  <div className="flex items-center gap-1.5">
-                    <Calendar className="w-3 h-3 text-mint-600" />
-                    <p>{formatFinMonth(shipping?.fin_month)}</p>
-                  </div>
-                </div>
-
-                <div>
-                  <p className="text-xs font-medium text-gray-500 mb-1">Weight:</p>
-                  <div className="flex items-center gap-1.5">
-                    <Weight className="w-3 h-3 text-mint-600" />
-                    <p>{shipping?.plan_qty || 0} ton</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-sm border p-6 space-y-6">
-                <div>
-                  <p className="text-xs font-medium text-gray-500 mb-1">
-                    Company:
-                  </p>
-                  <div className="flex items-center gap-1.5">
-                    <Building className="w-3 h-3 text-mint-600" />
-                    <p>{shipping?.company || "Tidak ada data"}</p>
-                  </div>
-                </div>
-
-                <div>
-                  <p className="text-xs font-medium text-gray-500 mb-1">
-                    Terminal:
-                  </p>
-                  <div className="flex items-center gap-1.5">
-                    <MapPin className="w-3 h-3 text-mint-600" />
-                    <p>{shipping?.terminal || "Tidak ada data"}</p>
-                  </div>
-                </div>
-
-                <div>
-                  <p className="text-xs font-medium text-gray-500 mb-1">
-                    Country:
-                  </p>
-                  <div className="flex items-center gap-1.5">
-                    <MapPin className="w-3 h-3 text-mint-600" />
-                    <p>{shipping?.country || "Tidak ada data"}</p>
-                  </div>
-                </div>
-
-                {shipping?.price_fob_vessel && (
-                  <div>
-                    <p className="text-xs font-medium text-gray-500 mb-1">
-                      Price (FOB Vessel):
-                    </p>
-                    <div className="flex items-center gap-1.5">
-                      <DollarSign className="w-3 h-3 text-mint-600" />
-                      <p>{shipping.price_fob_vessel}</p>
-                    </div>
-                  </div>
-                )}
-
-                {shipping?.cv_acceptable && (
-                  <div>
-                    <p className="text-xs font-medium text-gray-500 mb-1">
-                      CV Acceptable:
-                    </p>
-                    <div className="flex items-center gap-1.5">
-                      <Percent className="w-3 h-3 text-mint-600" />
-                      <p>{shipping.cv_acceptable}%</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+          </ScrollArea>
         )}
       </div>
     </div>
   );
 };
+
+const InfoItem = ({ 
+  icon: Icon, 
+  label, 
+  value 
+}: { 
+  icon: any;
+  label: string;
+  value: string | number | null;
+}) => (
+  <div>
+    <p className="text-xs font-medium text-gray-500 mb-1">{label}:</p>
+    <div className="flex items-center gap-1.5">
+      <Icon className="w-3 h-3 text-mint-600" />
+      <p>{value || "Tidak ada data"}</p>
+    </div>
+  </div>
+);
 
 export default ShippingDetail;

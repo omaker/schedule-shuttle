@@ -8,9 +8,20 @@ import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
 
 const Index = () => {
-  const [shippingData, setShippingData] = useState<any[]>([]);
+  const [shippingData, setShippingData] = useState<any[]>(() => {
+    // Try to get data from localStorage on initial load
+    const savedData = localStorage.getItem('shippingData');
+    return savedData ? JSON.parse(savedData) : [];
+  });
+  
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  const handleDataReceived = (data: any[]) => {
+    setShippingData(data);
+    // Save to localStorage when new data is received
+    localStorage.setItem('shippingData', JSON.stringify(data));
+  };
 
   const handleDownloadTemplate = () => {
     // Create template data with all columns
@@ -164,18 +175,11 @@ const Index = () => {
               <Download className="mr-2" />
               Download Template Excel
             </Button>
-            <Button
-              onClick={() => navigate("/dashboard")}
-              variant="default"
-              className="mx-auto bg-mint-600 hover:bg-mint-700 text-white"
-            >
-              View Dashboard
-            </Button>
           </div>
         </div>
 
         <div className="space-y-8">
-          <FileUpload onDataReceived={setShippingData} />
+          <FileUpload onDataReceived={handleDataReceived} />
           
           {shippingData.length > 0 && (
             <div className="mt-8 animate-fade-in">
