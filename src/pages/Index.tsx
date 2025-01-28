@@ -3,7 +3,7 @@ import { FileUpload } from "@/components/FileUpload";
 import { ShippingTable } from "@/components/ShippingTable";
 import { Button } from "@/components/ui/button";
 import { Upload, ArrowRight } from "lucide-react";
-import { ShippingDashboard } from "@/components/ShippingDashboard";
+import ShippingDashboard from "@/components/ShippingDashboard";
 import { Card } from "@/components/ui/card";
 
 const Index = () => {
