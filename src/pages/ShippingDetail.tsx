@@ -10,11 +10,19 @@ import {
 } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { format } from "date-fns";
 
 const ShippingDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { toast } = useToast();
+
+  const formatMonth = (monthNumber: number | null) => {
+    if (!monthNumber) return "Tidak ada data";
+    // Create a date object for the first day of the given month in the current year
+    const date = new Date(new Date().getFullYear(), monthNumber - 1, 1);
+    return format(date, 'MMMM');
+  };
 
   const { data: shipping, isLoading, isError } = useQuery({
     queryKey: ['shipping', id],
@@ -190,14 +198,14 @@ const ShippingDetail = () => {
                 <p className="text-xs font-medium text-gray-500 mb-1">Bulan:</p>
                 <div className="flex items-center gap-1.5">
                   <Calendar className="w-3 h-3 text-mint-600" />
-                  <p>{shipping?.month || "Tidak ada data"}</p>
+                  <p>{formatMonth(shipping?.month)}</p>
                 </div>
               </div>
               <div>
                 <p className="text-xs font-medium text-gray-500 mb-1">Fin Month:</p>
                 <div className="flex items-center gap-1.5">
                   <Calculator className="w-3 h-3 text-mint-600" />
-                  <p>{shipping?.fin_month || "Tidak ada data"}</p>
+                  <p>{formatMonth(shipping?.fin_month)}</p>
                 </div>
               </div>
             </div>
