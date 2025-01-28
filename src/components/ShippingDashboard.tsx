@@ -92,21 +92,21 @@ const ShippingDashboard = () => {
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
       case 'complete':
-        return 'bg-mint-50 text-mint-700 border-mint-200';
+        return 'bg-green-100 text-green-700 border-green-200';
       case 'in progress':
       case 'otw':
-        return 'bg-mint-50 text-mint-700 border-mint-200';
+        return 'bg-blue-100 text-blue-700 border-blue-200';
       case 'pending':
       case 'not ok':
-        return 'bg-mint-50 text-mint-700 border-mint-200';
+        return 'bg-yellow-100 text-yellow-700 border-yellow-200';
       case 'ok':
-        return 'bg-mint-50 text-mint-700 border-mint-200';
+        return 'bg-green-100 text-green-700 border-green-200';
       case 'unsold':
-        return 'bg-mint-50 text-mint-700 border-mint-200';
+        return 'bg-red-100 text-red-700 border-red-200';
       case 'rejected':
-        return 'bg-mint-50 text-mint-700 border-mint-200';
+        return 'bg-purple-100 text-purple-700 border-purple-200';
       default:
-        return 'bg-mint-50 text-mint-700 border-mint-200';
+        return 'bg-gray-100 text-gray-700 border-gray-200';
     }
   };
 
@@ -198,7 +198,7 @@ const ShippingDashboard = () => {
                           <Button
                             variant="outline"
                             size="icon"
-                            className="border-mint-200 hover:bg-mint-50 text-mint-700 h-8 w-8"
+                            className="bg-blue-50 border-blue-200 hover:bg-blue-100 text-blue-700 h-8 w-8"
                             onClick={() => setSelectedShipment(shipment)}
                           >
                             <Info className="h-4 w-4" />
@@ -339,7 +339,7 @@ const ShippingDashboard = () => {
                       <Button
                         variant="outline"
                         size="icon"
-                        className="border-mint-200 hover:bg-mint-50 text-mint-700 h-8 w-8"
+                        className="bg-red-50 border-red-200 hover:bg-red-100 text-red-700 h-8 w-8"
                         onClick={() => handleReject(shipment.excel_id)}
                       >
                         <Ban className="h-4 w-4" />
