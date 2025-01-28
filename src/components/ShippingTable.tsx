@@ -44,11 +44,16 @@ export const ShippingTable = ({ data, showCombinedData = false }: ShippingTableP
       }
     };
 
-    fetchData();
-  }, [toast]);
+    // Only fetch database data if we're showing combined data (after Excel upload)
+    if (showCombinedData) {
+      fetchData();
+    } else {
+      setIsLoading(false);
+    }
+  }, [toast, showCombinedData]);
 
   // Use either combined data or just database data based on showCombinedData prop
-  const displayData = showCombinedData ? [...dbData, ...data] : dbData;
+  const displayData = showCombinedData ? [...dbData, ...data] : [];
 
   const filteredData = displayData.filter(row => 
     Object.values(row).some(value => 
@@ -137,7 +142,7 @@ export const ShippingTable = ({ data, showCombinedData = false }: ShippingTableP
         <span className="text-sm text-muted-foreground">
           {showCombinedData 
             ? `Showing ${filteredData.length} items (${dbData.length} from database, ${data.length} from Excel)`
-            : `Showing ${filteredData.length} items from database`
+            : `No data to display. Please upload an Excel file.`
           }
         </span>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
