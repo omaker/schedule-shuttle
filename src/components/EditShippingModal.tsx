@@ -2,7 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -16,17 +16,39 @@ interface EditShippingModalProps {
 export const EditShippingModal = ({ isOpen, onClose, item, onUpdate }: EditShippingModalProps) => {
   const { toast } = useToast();
   const [formData, setFormData] = useState({
-    product: item.jenisBarang || "",
-    plan_qty: item.berat || "",
-    company: item.namaPengirim || "",
-    terminal: item.alamatPengirim || "",
-    country: item.alamatPenerima || "",
-    loading_status: item.status || ""
+    product: "",
+    plan_qty: "",
+    company: "",
+    terminal: "",
+    country: "",
+    loading_status: ""
   });
+
+  useEffect(() => {
+    if (item) {
+      setFormData({
+        product: item.jenisBarang || "",
+        plan_qty: item.berat || "",
+        company: item.namaPengirim || "",
+        terminal: item.alamatPengirim || "",
+        country: item.alamatPenerima || "",
+        loading_status: item.status || ""
+      });
+    }
+  }, [item]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      if (!item?.no) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Invalid shipping record ID",
+        });
+        return;
+      }
+
       const { error } = await supabase
         .from('shipping_schedules')
         .update({
@@ -56,6 +78,10 @@ export const EditShippingModal = ({ isOpen, onClose, item, onUpdate }: EditShipp
       });
     }
   };
+
+  if (!item) {
+    return null;
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
