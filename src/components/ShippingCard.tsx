@@ -1,7 +1,11 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ShippingItem } from "@/types/shipping";
-import { Ship, Weight, Calendar, Save, RefreshCw, ChevronRight, ChevronDown, Package, Building, MapPin, Anchor, Clock } from "lucide-react";
+import { 
+  Ship, Weight, Calendar, Save, RefreshCw, ChevronRight, ChevronDown, 
+  Package, Building, MapPin, DollarSign, Anchor, Clock, Info,
+  BarChart, FileText, Globe, Truck, Calculator, Scale
+} from "lucide-react";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -221,7 +225,7 @@ export const ShippingCard = ({ item, getStatusColor, view }: ShippingCardProps) 
           </div>
         </Card>
       </HoverCardTrigger>
-      <HoverCardContent className="w-96 p-6">
+      <HoverCardContent className="w-[800px] p-6">
         <div className="space-y-6">
           <div>
             <h3 className="text-lg font-semibold mb-2 text-mint-800">Detail Pengiriman #{item.no}</h3>
@@ -231,8 +235,36 @@ export const ShippingCard = ({ item, getStatusColor, view }: ShippingCardProps) 
             </Badge>
           </div>
 
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-3 gap-8">
+            {/* Informasi Dasar */}
             <div className="space-y-4">
+              <h4 className="font-medium text-mint-700 border-b pb-2">Informasi Dasar</h4>
+              <div>
+                <p className="text-xs font-medium text-gray-500 mb-1">Produk:</p>
+                <div className="flex items-center gap-2">
+                  <Package className="w-4 h-4 text-mint-600" />
+                  <p className="text-sm font-medium">{item.jenisBarang || "Tidak ada data"}</p>
+                </div>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-500 mb-1">Berat:</p>
+                <div className="flex items-center gap-2">
+                  <Weight className="w-4 h-4 text-mint-600" />
+                  <p className="text-sm font-medium">{item.berat} ton</p>
+                </div>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-500 mb-1">Status:</p>
+                <div className="flex items-center gap-2">
+                  <Info className="w-4 h-4 text-mint-600" />
+                  <p className="text-sm font-medium">{item.status}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Informasi Pengiriman */}
+            <div className="space-y-4">
+              <h4 className="font-medium text-mint-700 border-b pb-2">Informasi Pengiriman</h4>
               <div>
                 <p className="text-xs font-medium text-gray-500 mb-1">Pengirim:</p>
                 <div className="flex items-start gap-2">
@@ -243,7 +275,6 @@ export const ShippingCard = ({ item, getStatusColor, view }: ShippingCardProps) 
                   </div>
                 </div>
               </div>
-
               <div>
                 <p className="text-xs font-medium text-gray-500 mb-1">Penerima:</p>
                 <div className="flex items-start gap-2">
@@ -254,30 +285,94 @@ export const ShippingCard = ({ item, getStatusColor, view }: ShippingCardProps) 
                   </div>
                 </div>
               </div>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Produk:</p>
-                <div className="flex items-center gap-2">
-                  <Package className="w-4 h-4 text-mint-600" />
-                  <p className="text-sm font-medium">{item.jenisBarang || "Tidak ada data"}</p>
-                </div>
-              </div>
-
-              <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Berat:</p>
-                <div className="flex items-center gap-2">
-                  <Weight className="w-4 h-4 text-mint-600" />
-                  <p className="text-sm font-medium">{item.berat} ton</p>
-                </div>
-              </div>
-
               <div>
                 <p className="text-xs font-medium text-gray-500 mb-1">Tanggal Pengiriman:</p>
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-mint-600" />
                   <p className="text-sm font-medium">{item.tanggalPengiriman}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Detail Tambahan */}
+            <div className="space-y-4">
+              <h4 className="font-medium text-mint-700 border-b pb-2">Detail Tambahan</h4>
+              <div>
+                <p className="text-xs font-medium text-gray-500 mb-1">Tahun:</p>
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-mint-600" />
+                  <p className="text-sm font-medium">{item.year || "Tidak ada data"}</p>
+                </div>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-500 mb-1">Bulan:</p>
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-mint-600" />
+                  <p className="text-sm font-medium">{item.month || "Tidak ada data"}</p>
+                </div>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-500 mb-1">Fin Month:</p>
+                <div className="flex items-center gap-2">
+                  <Calculator className="w-4 h-4 text-mint-600" />
+                  <p className="text-sm font-medium">{item.finMonth || "Tidak ada data"}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Additional Details */}
+          <div className="grid grid-cols-3 gap-8 pt-4 border-t">
+            <div className="space-y-4">
+              <h4 className="font-medium text-mint-700 border-b pb-2">Informasi Kapal</h4>
+              <div>
+                <p className="text-xs font-medium text-gray-500 mb-1">Vessel:</p>
+                <div className="flex items-center gap-2">
+                  <Anchor className="w-4 h-4 text-mint-600" />
+                  <p className="text-sm font-medium">{item.vessel || "Tidak ada data"}</p>
+                </div>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-500 mb-1">Ship Code:</p>
+                <div className="flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-mint-600" />
+                  <p className="text-sm font-medium">{item.shipCode || "Tidak ada data"}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <h4 className="font-medium text-mint-700 border-b pb-2">Informasi Region</h4>
+              <div>
+                <p className="text-xs font-medium text-gray-500 mb-1">Region:</p>
+                <div className="flex items-center gap-2">
+                  <Globe className="w-4 h-4 text-mint-600" />
+                  <p className="text-sm font-medium">{item.region || "Tidak ada data"}</p>
+                </div>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-500 mb-1">Terminal:</p>
+                <div className="flex items-center gap-2">
+                  <Truck className="w-4 h-4 text-mint-600" />
+                  <p className="text-sm font-medium">{item.terminal || "Tidak ada data"}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <h4 className="font-medium text-mint-700 border-b pb-2">Informasi Kontrak</h4>
+              <div>
+                <p className="text-xs font-medium text-gray-500 mb-1">Contract Period:</p>
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-mint-600" />
+                  <p className="text-sm font-medium">{item.contractPeriod || "Tidak ada data"}</p>
+                </div>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-500 mb-1">Price Code:</p>
+                <div className="flex items-center gap-2">
+                  <DollarSign className="w-4 h-4 text-mint-600" />
+                  <p className="text-sm font-medium">{item.priceCode || "Tidak ada data"}</p>
                 </div>
               </div>
             </div>
