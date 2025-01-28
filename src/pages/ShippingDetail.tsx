@@ -1,311 +1,203 @@
-import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { 
-  Ship, Weight, Calendar, Package, Building, MapPin, DollarSign, Anchor, Clock, Info,
-  BarChart, FileText, Globe, Truck, Calculator, Scale
+  Ship, Package, Building, MapPin, Calendar, 
+  Weight, DollarSign, Percent, ArrowLeft 
 } from "lucide-react";
-import { Loader2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { format } from "date-fns";
+import { formatShippingDate, formatFinMonth } from "@/utils/dateFormatters";
 
 const ShippingDetail = () => {
-  const navigate = useNavigate();
   const { id } = useParams();
-  const { toast } = useToast();
-
-  const formatMonth = (monthNumber: number | null) => {
-    if (!monthNumber) return "Tidak ada data";
-    // Since the month field contains the date, we'll create a date object for January
-    // This assumes all dates are in January as per the current data
-    const date = new Date(new Date().getFullYear(), 0, monthNumber); // 0 for January
-    return format(date, "d MMMM"); // Format as "25 January"
-  };
+  const navigate = useNavigate();
 
   const { data: shipping, isLoading, isError } = useQuery({
-    queryKey: ['shipping', id],
+    queryKey: ["shipping", id],
     queryFn: async () => {
-      console.log('Fetching shipping details for ID:', id);
       const { data, error } = await supabase
-        .from('shipping_schedules')
-        .select('*')
-        .eq('excel_id', id)
-        .maybeSingle();
+        .from("shipping_schedules")
+        .select()
+        .eq("excel_id", id)
+        .single();
 
-      if (error) {
-        console.error('Error fetching shipping details:', error);
-        throw error;
-      }
-
-      if (!data) {
-        console.log('No shipping data found for ID:', id);
-        throw new Error('Shipping schedule not found');
-      }
-
-      console.log('Shipping data retrieved:', data);
+      if (error) throw error;
       return data;
     },
-    meta: {
-      onError: (error: Error) => {
-        console.error('Query error:', error);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to load shipping details. The schedule might not exist.",
-        });
-      }
-    }
   });
 
-  const getStatusColor = (status: string) => {
-    switch (status?.toLowerCase()) {
-      case 'complete':
-        return 'bg-green-100 text-green-800';
-      case 'in progress':
-      case 'otw':
-        return 'bg-blue-100 text-blue-800';
-      case 'pending':
-      case 'not ok':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'ok':
-        return 'bg-green-100 text-green-800';
-      case 'unsold':
-        return 'bg-red-100 text-red-800';
+  const getStatusColor = (status: string | null) => {
+    if (!status) return "bg-gray-500/10 text-gray-500 border-gray-500/20";
+    
+    switch (status.toLowerCase()) {
+      case "complete":
+        return "bg-green-500/10 text-green-500 border-green-500/20";
+      case "in progress":
+      case "otw":
+        return "bg-blue-500/10 text-blue-500 border-blue-500/20";
+      case "pending":
+      case "not ok":
+        return "bg-yellow-500/10 text-yellow-500 border-yellow-500/20";
+      case "ok":
+        return "bg-green-500/10 text-green-500 border-green-500/20";
+      case "unsold":
+        return "bg-red-500/10 text-red-500 border-red-500/20";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-500/10 text-gray-500 border-gray-500/20";
     }
   };
 
-  if (isLoading) {
+  if (isError) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-mint-600" />
-      </div>
-    );
-  }
-
-  if (isError || !shipping) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-mint-50 to-mint-100 p-8">
-        <div className="max-w-7xl mx-auto">
-          <Button 
-            onClick={() => navigate(-1)} 
-            variant="outline" 
-            className="mb-6 bg-white hover:bg-gray-50"
-          >
+      <div className="min-h-screen bg-gradient-to-br from-mint-50 to-mint-100 py-12 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            Error loading shipping details
+          </h1>
+          <Button onClick={() => navigate("/")} variant="outline">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Kembali
+            Back to Home
           </Button>
-          
-          <div className="bg-white rounded-xl shadow-sm p-6 text-center">
-            <h1 className="text-2xl font-semibold mb-4 text-mint-800">
-              Shipping Schedule Not Found
-            </h1>
-            <p className="text-gray-600">
-              The shipping schedule you're looking for doesn't exist or has been removed.
-            </p>
-          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-mint-50 to-mint-100 p-8">
-      <div className="max-w-7xl mx-auto">
-        <Button 
-          onClick={() => navigate(-1)} 
-          variant="outline" 
-          className="mb-6 bg-white hover:bg-gray-50"
+    <div className="min-h-screen bg-gradient-to-br from-mint-50 to-mint-100 py-12 px-4">
+      <div className="max-w-4xl mx-auto">
+        <Button
+          onClick={() => navigate("/")}
+          variant="outline"
+          className="mb-6"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Kembali
+          Back to Home
         </Button>
 
-        <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
-          <div>
-            <h1 className="text-2xl font-semibold mb-2 text-mint-800">
-              Detail Pengiriman #{shipping?.excel_id}
-            </h1>
-            <Badge className={`${getStatusColor(shipping?.loading_status || '')} flex items-center gap-1.5 w-fit`}>
-              <Ship className="w-3 h-3" />
-              {shipping?.loading_status || 'Pending'}
-            </Badge>
+        {isLoading ? (
+          <div className="space-y-4">
+            <Skeleton className="h-8 w-64" />
+            <Skeleton className="h-64 w-full" />
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-sm">
-            {/* Informasi Dasar */}
-            <div className="space-y-4">
-              <h2 className="font-medium text-mint-700 border-b pb-1">Informasi Dasar</h2>
-              <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Produk:</p>
+        ) : (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h1 className="text-2xl font-bold text-gray-900">
+                Shipping Details #{shipping?.excel_id}
+              </h1>
+              <div
+                className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                  shipping?.loading_status
+                )}`}
+              >
                 <div className="flex items-center gap-1.5">
-                  <Package className="w-3 h-3 text-mint-600" />
-                  <p>{shipping?.product || "Tidak ada data"}</p>
-                </div>
-              </div>
-              <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Berat:</p>
-                <div className="flex items-center gap-1.5">
-                  <Weight className="w-3 h-3 text-mint-600" />
-                  <p>{shipping?.plan_qty || 0} ton</p>
-                </div>
-              </div>
-              <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Status:</p>
-                <div className="flex items-center gap-1.5">
-                  <Info className="w-3 h-3 text-mint-600" />
-                  <p>{shipping?.loading_status || "Pending"}</p>
+                  <Ship className="w-3 h-3" />
+                  {shipping?.loading_status || "No Status"}
                 </div>
               </div>
             </div>
 
-            {/* Informasi Pengiriman */}
-            <div className="space-y-4">
-              <h2 className="font-medium text-mint-700 border-b pb-1">Informasi Pengiriman</h2>
-              <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Perusahaan:</p>
-                <div className="flex items-start gap-1.5">
-                  <Building className="w-3 h-3 text-mint-600 mt-0.5" />
-                  <div>
-                    <p>{shipping?.company || "Tidak ada data"}</p>
-                    <p className="text-gray-600">{shipping?.terminal || "Tidak ada data"}</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-white rounded-lg shadow-sm border p-6 space-y-6">
+                <div>
+                  <p className="text-xs font-medium text-gray-500 mb-1">
+                    Product Details:
+                  </p>
+                  <div className="flex items-center gap-1.5">
+                    <Package className="w-3 h-3 text-mint-600" />
+                    <p>{shipping?.product || "Tidak ada data"}</p>
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-xs font-medium text-gray-500 mb-1">
+                    Tanggal:
+                  </p>
+                  <div className="flex items-center gap-1.5">
+                    <Calendar className="w-3 h-3 text-mint-600" />
+                    <p>{formatShippingDate(shipping?.month)}</p>
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-xs font-medium text-gray-500 mb-1">
+                    Financial Month:
+                  </p>
+                  <div className="flex items-center gap-1.5">
+                    <Calendar className="w-3 h-3 text-mint-600" />
+                    <p>{formatFinMonth(shipping?.fin_month)}</p>
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-xs font-medium text-gray-500 mb-1">Weight:</p>
+                  <div className="flex items-center gap-1.5">
+                    <Weight className="w-3 h-3 text-mint-600" />
+                    <p>{shipping?.plan_qty || 0} ton</p>
                   </div>
                 </div>
               </div>
-              <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Negara:</p>
-                <div className="flex items-center gap-1.5">
-                  <MapPin className="w-3 h-3 text-mint-600" />
-                  <p>{shipping?.country || "Tidak ada data"}</p>
-                </div>
-              </div>
-            </div>
 
-            {/* Detail Tambahan */}
-            <div className="space-y-4">
-              <h2 className="font-medium text-mint-700 border-b pb-1">Detail Tambahan</h2>
-              <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Tahun:</p>
-                <div className="flex items-center gap-1.5">
-                  <Calendar className="w-3 h-3 text-mint-600" />
-                  <p>{shipping?.year || "Tidak ada data"}</p>
+              <div className="bg-white rounded-lg shadow-sm border p-6 space-y-6">
+                <div>
+                  <p className="text-xs font-medium text-gray-500 mb-1">
+                    Company:
+                  </p>
+                  <div className="flex items-center gap-1.5">
+                    <Building className="w-3 h-3 text-mint-600" />
+                    <p>{shipping?.company || "Tidak ada data"}</p>
+                  </div>
                 </div>
-              </div>
-              <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Tanggal:</p>
-                <div className="flex items-center gap-1.5">
-                  <Calendar className="w-3 h-3 text-mint-600" />
-                  <p>{formatMonth(shipping?.month)}</p>
-                </div>
-              </div>
-              <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Fin Month:</p>
-                <div className="flex items-center gap-1.5">
-                  <Calculator className="w-3 h-3 text-mint-600" />
-                  <p>{formatMonth(shipping?.fin_month)}</p>
-                </div>
-              </div>
-            </div>
 
-            {/* Informasi Kapal */}
-            <div className="space-y-4">
-              <h2 className="font-medium text-mint-700 border-b pb-1">Informasi Kapal</h2>
-              <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Vessel:</p>
-                <div className="flex items-center gap-1.5">
-                  <Anchor className="w-3 h-3 text-mint-600" />
-                  <p>{shipping?.vessel || "Tidak ada data"}</p>
+                <div>
+                  <p className="text-xs font-medium text-gray-500 mb-1">
+                    Terminal:
+                  </p>
+                  <div className="flex items-center gap-1.5">
+                    <MapPin className="w-3 h-3 text-mint-600" />
+                    <p>{shipping?.terminal || "Tidak ada data"}</p>
+                  </div>
                 </div>
-              </div>
-              <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Ship Code:</p>
-                <div className="flex items-center gap-1.5">
-                  <FileText className="w-3 h-3 text-mint-600" />
-                  <p>{shipping?.ship_code || "Tidak ada data"}</p>
+
+                <div>
+                  <p className="text-xs font-medium text-gray-500 mb-1">
+                    Country:
+                  </p>
+                  <div className="flex items-center gap-1.5">
+                    <MapPin className="w-3 h-3 text-mint-600" />
+                    <p>{shipping?.country || "Tidak ada data"}</p>
+                  </div>
                 </div>
+
+                {shipping?.price_fob_vessel && (
+                  <div>
+                    <p className="text-xs font-medium text-gray-500 mb-1">
+                      Price (FOB Vessel):
+                    </p>
+                    <div className="flex items-center gap-1.5">
+                      <DollarSign className="w-3 h-3 text-mint-600" />
+                      <p>{shipping.price_fob_vessel}</p>
+                    </div>
+                  </div>
+                )}
+
+                {shipping?.cv_acceptable && (
+                  <div>
+                    <p className="text-xs font-medium text-gray-500 mb-1">
+                      CV Acceptable:
+                    </p>
+                    <div className="flex items-center gap-1.5">
+                      <Percent className="w-3 h-3 text-mint-600" />
+                      <p>{shipping.cv_acceptable}%</p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
-
-          {/* Additional Details */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 pt-6 border-t text-sm">
-            <div className="space-y-4">
-              <h2 className="font-medium text-mint-700 border-b pb-1">Informasi Region</h2>
-              <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Region:</p>
-                <div className="flex items-center gap-1.5">
-                  <Globe className="w-3 h-3 text-mint-600" />
-                  <p>{shipping?.region || "Tidak ada data"}</p>
-                </div>
-              </div>
-              <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Terminal:</p>
-                <div className="flex items-center gap-1.5">
-                  <Truck className="w-3 h-3 text-mint-600" />
-                  <p>{shipping?.terminal || "Tidak ada data"}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <h2 className="font-medium text-mint-700 border-b pb-1">Informasi Kontrak</h2>
-              <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Contract Period:</p>
-                <div className="flex items-center gap-1.5">
-                  <Clock className="w-3 h-3 text-mint-600" />
-                  <p>{shipping?.contract_period || "Tidak ada data"}</p>
-                </div>
-              </div>
-              <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Price Code:</p>
-                <div className="flex items-center gap-1.5">
-                  <DollarSign className="w-3 h-3 text-mint-600" />
-                  <p>{shipping?.price_code || "Tidak ada data"}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <h2 className="font-medium text-mint-700 border-b pb-1">Informasi Harga</h2>
-              <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Price FOB:</p>
-                <div className="flex items-center gap-1.5">
-                  <DollarSign className="w-3 h-3 text-mint-600" />
-                  <p>{shipping?.price_fob_vessel || "Tidak ada data"}</p>
-                </div>
-              </div>
-              <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Revenue:</p>
-                <div className="flex items-center gap-1.5">
-                  <BarChart className="w-3 h-3 text-mint-600" />
-                  <p>{shipping?.revenue || "Tidak ada data"}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <h2 className="font-medium text-mint-700 border-b pb-1">Informasi CV</h2>
-              <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">CV Typical:</p>
-                <div className="flex items-center gap-1.5">
-                  <Scale className="w-3 h-3 text-mint-600" />
-                  <p>{shipping?.cv_typical || "Tidak ada data"}</p>
-                </div>
-              </div>
-              <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">CV Acceptable:</p>
-                <div className="flex items-center gap-1.5">
-                  <Scale className="w-3 h-3 text-mint-600" />
-                  <p>{shipping?.cv_acceptable || "Tidak ada data"}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
