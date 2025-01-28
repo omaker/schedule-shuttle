@@ -20,16 +20,16 @@ const Index = () => {
       case 'dashboard':
         return (
           <div className="space-y-6">
-            <ShippingDashboard />
-            <div className="flex justify-center mt-8">
+            <div className="flex justify-end mb-6">
               <Button 
                 onClick={() => setCurrentView('upload')}
-                className="bg-mint-600 hover:bg-mint-700 text-white"
+                className="bg-mint-600 hover:bg-mint-700 text-white px-6 py-3 text-lg shadow-lg transition-all hover:shadow-xl"
               >
-                <Upload className="mr-2 h-4 w-4" />
-                Upload New Excel File
+                <Upload className="mr-2 h-5 w-5" />
+                Upload Excel File
               </Button>
             </div>
+            <ShippingDashboard />
           </div>
         );
       
@@ -61,13 +61,22 @@ const Index = () => {
               <h2 className="text-2xl font-semibold text-gray-900">
                 Shipping Data
               </h2>
-              <Button 
-                variant="outline"
-                onClick={() => setCurrentView('dashboard')}
-                className="text-mint-600 border-mint-600 hover:bg-mint-50"
-              >
-                Back to Dashboard
-              </Button>
+              <div className="flex gap-4">
+                <Button 
+                  onClick={() => setCurrentView('upload')}
+                  className="bg-mint-600 hover:bg-mint-700 text-white"
+                >
+                  <Upload className="mr-2 h-4 w-4" />
+                  Upload New File
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={() => setCurrentView('dashboard')}
+                  className="text-mint-600 border-mint-600 hover:bg-mint-50"
+                >
+                  Back to Dashboard
+                </Button>
+              </div>
             </div>
             <ShippingTable data={shippingData} showCombinedData={true} />
           </div>
