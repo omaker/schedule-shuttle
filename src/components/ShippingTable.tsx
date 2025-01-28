@@ -114,9 +114,9 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
       <ScrollArea className="h-[calc(100vh-16rem)]">
         <div className={`
           ${view === "grid" 
-            ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6" 
+            ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4" 
             : "flex flex-col gap-4"}
-          p-6
+          p-4
         `}>
           {filteredData.map((row, index) => (
             <ShippingCard
