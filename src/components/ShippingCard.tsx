@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { ShippingItem } from "@/types/shipping";
 import { 
   Ship, Weight, Calendar, Save, RefreshCw, ChevronRight, ChevronDown, 
-  Package, Building, MapPin
+  Package, Building, MapPin, Rocket
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -111,23 +111,23 @@ export const ShippingCard = ({ item, getStatusColor, view }: ShippingCardProps) 
   if (view === "compact") {
     return (
       <Card 
-        className="p-4 hover:bg-gray-50 transition-all border-l-4 border-l-mint-500 animate-fade-in cursor-pointer"
+        className="p-4 hover:bg-gradient-to-r from-slate-900 to-slate-800 transition-all border-l-4 border-l-blue-500 animate-fade-in cursor-pointer bg-slate-900/90 backdrop-blur-sm shadow-lg hover:shadow-blue-500/20"
         onClick={handleCardClick}
       >
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Badge className={`${getStatusColor(item.status)} flex items-center gap-1.5`}>
+              <Badge className={`${getStatusColor(item.status)} flex items-center gap-1.5 bg-blue-500/20 text-blue-300`}>
                 <Ship className="w-3 h-3" />
                 {item.status}
               </Badge>
-              <span className="text-sm font-mono text-gray-500">#{item.no}</span>
+              <span className="text-sm font-mono text-blue-300/70">#{item.no}</span>
             </div>
             <div className="flex items-center gap-2">
               {!exists ? (
                 <button
                   onClick={(e) => { e.stopPropagation(); handleSave(); }}
-                  className="px-3 py-1.5 rounded-md hover:bg-mint-50 text-mint-600 text-sm flex items-center gap-1.5"
+                  className="px-3 py-1.5 rounded-md hover:bg-blue-500/20 text-blue-300 text-sm flex items-center gap-1.5 transition-colors"
                 >
                   <Save className="w-4 h-4" />
                   Simpan
@@ -135,13 +135,16 @@ export const ShippingCard = ({ item, getStatusColor, view }: ShippingCardProps) 
               ) : (
                 <button
                   onClick={(e) => { e.stopPropagation(); handleUpdate(); }}
-                  className="px-3 py-1.5 rounded-md hover:bg-mint-50 text-mint-600 text-sm flex items-center gap-1.5"
+                  className="px-3 py-1.5 rounded-md hover:bg-blue-500/20 text-blue-300 text-sm flex items-center gap-1.5 transition-colors"
                 >
                   <RefreshCw className="w-4 h-4" />
                   Perbarui
                 </button>
               )}
-              <button onClick={(e) => { e.stopPropagation(); setIsExpanded(!isExpanded); }}>
+              <button 
+                onClick={(e) => { e.stopPropagation(); setIsExpanded(!isExpanded); }}
+                className="text-blue-300 hover:text-blue-400 transition-colors"
+              >
                 {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
               </button>
             </div>
@@ -149,32 +152,32 @@ export const ShippingCard = ({ item, getStatusColor, view }: ShippingCardProps) 
 
           <div className="grid grid-cols-2 gap-4">
             <div className="flex items-center gap-2">
-              <Package className="w-4 h-4 text-mint-600" />
-              <span className="text-sm font-medium text-mint-800">{item.jenisBarang || "Tidak ada data"}</span>
+              <Package className="w-4 h-4 text-blue-400" />
+              <span className="text-sm font-medium text-blue-100">{item.jenisBarang || "Tidak ada data"}</span>
             </div>
             <div className="flex items-center gap-2 justify-end">
-              <Weight className="w-4 h-4 text-mint-600" />
-              <span className="text-sm text-gray-600">{item.berat} ton</span>
+              <Weight className="w-4 h-4 text-blue-400" />
+              <span className="text-sm text-blue-300">{item.berat} ton</span>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            <Calendar className="w-4 h-4 text-mint-600" />
+          <div className="flex items-center gap-2 text-sm text-blue-300/70">
+            <Calendar className="w-4 h-4 text-blue-400" />
             <span>{item.tanggalPengiriman}</span>
           </div>
         </div>
         
         {isExpanded && (
-          <div className="mt-4 pt-4 border-t border-gray-100 grid grid-cols-2 gap-6">
+          <div className="mt-4 pt-4 border-t border-blue-800/50 grid grid-cols-2 gap-6">
             <div>
-              <p className="text-xs font-medium text-gray-500 mb-1">Pengirim:</p>
-              <p className="text-sm font-medium">{item.namaPengirim || "Tidak ada data"}</p>
-              <p className="text-sm text-gray-600">{item.alamatPengirim || "Tidak ada data"}</p>
+              <p className="text-xs font-medium text-blue-400 mb-1">Pengirim:</p>
+              <p className="text-sm font-medium text-blue-100">{item.namaPengirim || "Tidak ada data"}</p>
+              <p className="text-sm text-blue-300">{item.alamatPengirim || "Tidak ada data"}</p>
             </div>
             <div>
-              <p className="text-xs font-medium text-gray-500 mb-1">Penerima:</p>
-              <p className="text-sm font-medium">{item.namaPenerima || "Tidak ada data"}</p>
-              <p className="text-sm text-gray-600">{item.alamatPenerima || "Tidak ada data"}</p>
+              <p className="text-xs font-medium text-blue-400 mb-1">Penerima:</p>
+              <p className="text-sm font-medium text-blue-100">{item.namaPenerima || "Tidak ada data"}</p>
+              <p className="text-sm text-blue-300">{item.alamatPenerima || "Tidak ada data"}</p>
             </div>
           </div>
         )}
@@ -184,51 +187,71 @@ export const ShippingCard = ({ item, getStatusColor, view }: ShippingCardProps) 
 
   return (
     <Card 
-      className="p-6 transition-all hover:-translate-y-1 hover:shadow-lg bg-white relative animate-fade-in border-t-4 border-t-mint-500 cursor-pointer"
+      className="p-6 transition-all hover:-translate-y-1 hover:shadow-xl bg-slate-900/90 backdrop-blur-sm relative animate-fade-in border-t-4 border-t-blue-500 cursor-pointer hover:shadow-blue-500/20 group"
       onClick={handleCardClick}
     >
-      <div className="grid gap-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Badge className={`${getStatusColor(item.status)} flex items-center gap-1.5`}>
-              <Ship className="w-3 h-3" />
-              {item.status}
-            </Badge>
-            <span className="text-sm font-mono text-gray-500">#{item.no}</span>
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg" />
+      <div className="relative z-10">
+        <div className="grid gap-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Badge className={`${getStatusColor(item.status)} flex items-center gap-1.5 bg-blue-500/20 text-blue-300`}>
+                <Ship className="w-3 h-3" />
+                {item.status}
+              </Badge>
+              <span className="text-sm font-mono text-blue-300/70">#{item.no}</span>
+            </div>
+            {!exists ? (
+              <button
+                onClick={(e) => { e.stopPropagation(); handleSave(); }}
+                className="px-3 py-1.5 rounded-md hover:bg-blue-500/20 text-blue-300 text-sm flex items-center gap-1.5 transition-colors"
+              >
+                <Save className="w-4 h-4" />
+                Simpan
+              </button>
+            ) : (
+              <button
+                onClick={(e) => { e.stopPropagation(); handleUpdate(); }}
+                className="px-3 py-1.5 rounded-md hover:bg-blue-500/20 text-blue-300 text-sm flex items-center gap-1.5 transition-colors"
+              >
+                <RefreshCw className="w-4 h-4" />
+                Perbarui
+              </button>
+            )}
           </div>
-          {!exists ? (
-            <button
-              onClick={(e) => { e.stopPropagation(); handleSave(); }}
-              className="px-3 py-1.5 rounded-md hover:bg-mint-50 text-mint-600 text-sm flex items-center gap-1.5"
-            >
-              <Save className="w-4 h-4" />
-              Simpan
-            </button>
-          ) : (
-            <button
-              onClick={(e) => { e.stopPropagation(); handleUpdate(); }}
-              className="px-3 py-1.5 rounded-md hover:bg-mint-50 text-mint-600 text-sm flex items-center gap-1.5"
-            >
-              <RefreshCw className="w-4 h-4" />
-              Perbarui
-            </button>
-          )}
-        </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="flex items-center gap-2">
-            <Package className="w-4 h-4 text-mint-600" />
-            <span className="text-base font-medium text-mint-800">{item.jenisBarang || "Tidak ada data"}</span>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex items-center gap-2">
+              <Package className="w-4 h-4 text-blue-400" />
+              <span className="text-base font-medium text-blue-100">{item.jenisBarang || "Tidak ada data"}</span>
+            </div>
+            <div className="flex items-center gap-2 justify-end">
+              <Weight className="w-4 h-4 text-blue-400" />
+              <span className="text-sm text-blue-300">{item.berat} ton</span>
+            </div>
           </div>
-          <div className="flex items-center gap-2 justify-end">
-            <Weight className="w-4 h-4 text-mint-600" />
-            <span className="text-sm text-gray-600">{item.berat} ton</span>
-          </div>
-        </div>
 
-        <div className="flex items-center gap-2 text-sm text-gray-500">
-          <Calendar className="w-4 h-4 text-mint-600" />
-          <span>{item.tanggalPengiriman}</span>
+          <div className="flex items-center gap-2 text-sm text-blue-300/70">
+            <Calendar className="w-4 h-4 text-blue-400" />
+            <span>{item.tanggalPengiriman}</span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 pt-4 border-t border-blue-800/50">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <Building className="w-4 h-4 text-blue-400" />
+                <span className="text-sm font-medium text-blue-100">{item.namaPengirim || "Tidak ada data"}</span>
+              </div>
+              <p className="text-sm text-blue-300 pl-6">{item.alamatPengirim || "Tidak ada data"}</p>
+            </div>
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <MapPin className="w-4 h-4 text-blue-400" />
+                <span className="text-sm font-medium text-blue-100">{item.namaPenerima || "Tidak ada data"}</span>
+              </div>
+              <p className="text-sm text-blue-300 pl-6">{item.alamatPenerima || "Tidak ada data"}</p>
+            </div>
+          </div>
         </div>
       </div>
     </Card>
