@@ -13,7 +13,8 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import { Loader2 } from "lucide-react";
+import { Loader2, Package, Ship, Calendar } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export const ShippingDashboard = () => {
   const [data, setData] = useState<any[]>([]);
@@ -30,21 +31,18 @@ export const ShippingDashboard = () => {
         console.log('Fetching shipping data...');
         const { data: shipments, error } = await supabase
           .from('shipping_schedules')
-          .select('*');
+          .select('*')
+          .order('created_at', { ascending: false });
 
         if (error) throw error;
 
         console.log('Fetched shipping data:', shipments);
         setData(shipments || []);
-
-        // Calculate total shipments
         setTotalShipments(shipments?.length || 0);
 
-        // Calculate total weight
         const total = shipments?.reduce((acc, curr) => acc + (Number(curr.plan_qty) || 0), 0);
         setTotalWeight(Math.round(total));
 
-        // Calculate status distribution
         const statusCount = shipments?.reduce((acc: any, curr) => {
           const status = curr.loading_status || 'Unknown';
           acc[status] = (acc[status] || 0) + 1;
@@ -57,7 +55,6 @@ export const ShippingDashboard = () => {
         }));
 
         setStatusDistribution(statusData);
-
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -71,37 +68,56 @@ export const ShippingDashboard = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <Loader2 className="h-8 w-8 animate-spin text-mint-600" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 p-6">
-      <h2 className="text-3xl font-bold text-gray-900">Shipping Dashboard</h2>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-2">Total Shipments</h3>
-          <p className="text-3xl font-bold text-mint-500">{totalShipments}</p>
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="p-6 border-mint-100 hover:border-mint-200 transition-colors">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-mint-100 rounded-lg">
+              <Ship className="h-6 w-6 text-mint-600" />
+            </div>
+            <div>
+              <h3 className="text-sm font-medium text-gray-500">Total Shipments</h3>
+              <p className="text-2xl font-bold text-mint-600">{totalShipments}</p>
+            </div>
+          </div>
         </Card>
         
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-2">Total Weight</h3>
-          <p className="text-3xl font-bold text-mint-500">{totalWeight.toLocaleString()} tons</p>
+        <Card className="p-6 border-mint-100 hover:border-mint-200 transition-colors">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-mint-100 rounded-lg">
+              <Package className="h-6 w-6 text-mint-600" />
+            </div>
+            <div>
+              <h3 className="text-sm font-medium text-gray-500">Total Weight</h3>
+              <p className="text-2xl font-bold text-mint-600">{totalWeight.toLocaleString()} tons</p>
+            </div>
+          </div>
         </Card>
         
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-2">Average Weight</h3>
-          <p className="text-3xl font-bold text-mint-500">
-            {totalShipments ? Math.round(totalWeight / totalShipments).toLocaleString() : 0} tons
-          </p>
+        <Card className="p-6 border-mint-100 hover:border-mint-200 transition-colors">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-mint-100 rounded-lg">
+              <Calendar className="h-6 w-6 text-mint-600" />
+            </div>
+            <div>
+              <h3 className="text-sm font-medium text-gray-500">Average Weight</h3>
+              <p className="text-2xl font-bold text-mint-600">
+                {totalShipments ? Math.round(totalWeight / totalShipments).toLocaleString() : 0} tons
+              </p>
+            </div>
+          </div>
         </Card>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Status Distribution</h3>
+          <h3 className="text-lg font-semibold mb-4 text-gray-900">Status Distribution</h3>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -126,26 +142,25 @@ export const ShippingDashboard = () => {
         </Card>
 
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Weight by Status</h3>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={data}
-                margin={{
-                  top: 5,
-                  right: 30,
-                  left: 20,
-                  bottom: 5,
-                }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="loading_status" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="plan_qty" fill="#2a9d8f" name="Weight (tons)" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+          <h3 className="text-lg font-semibold mb-4 text-gray-900">Recent Shipments</h3>
+          <ScrollArea className="h-[300px] w-full">
+            <div className="space-y-4">
+              {data.slice(0, 5).map((shipment, index) => (
+                <Card key={index} className="p-4 border-mint-100">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">{shipment.product || 'N/A'}</p>
+                      <p className="text-xs text-gray-500">{shipment.company || 'N/A'}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-medium text-mint-600">{shipment.plan_qty || 0} tons</p>
+                      <p className="text-xs text-gray-500">{shipment.loading_status || 'N/A'}</p>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </ScrollArea>
         </Card>
       </div>
     </div>
