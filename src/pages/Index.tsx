@@ -6,10 +6,11 @@ import { Download } from "lucide-react";
 import * as XLSX from "xlsx";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
+import { ShippingDashboard } from "@/components/ShippingDashboard";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Index = () => {
   const [shippingData, setShippingData] = useState<any[]>(() => {
-    // Try to get data from localStorage on initial load
     const savedData = localStorage.getItem('shippingData');
     return savedData ? JSON.parse(savedData) : [];
   });
@@ -19,7 +20,6 @@ const Index = () => {
 
   const handleDataReceived = (data: any[]) => {
     setShippingData(data);
-    // Save to localStorage when new data is received
     localStorage.setItem('shippingData', JSON.stringify(data));
   };
 
@@ -183,10 +183,21 @@ const Index = () => {
           
           {shippingData.length > 0 && (
             <div className="mt-8 animate-fade-in">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-                Data Shipping Schedule
-              </h2>
-              <ShippingTable data={shippingData} />
+              <Tabs defaultValue="dashboard" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+                  <TabsTrigger value="table">Table View</TabsTrigger>
+                </TabsList>
+                <TabsContent value="dashboard">
+                  <ShippingDashboard />
+                </TabsContent>
+                <TabsContent value="table">
+                  <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                    Data Shipping Schedule
+                  </h2>
+                  <ShippingTable data={shippingData} />
+                </TabsContent>
+              </Tabs>
             </div>
           )}
         </div>
