@@ -112,64 +112,64 @@ export const ShippingCard = ({ item, getStatusColor, view }: ShippingCardProps) 
     return (
       <Card 
         className="relative group cursor-pointer overflow-hidden"
-        onClick={handleCardClick}
+        onClick={() => navigate(`/shipping/${item.no}`)}
       >
-        <div className="p-4 space-y-4">
+        <div className="p-3 space-y-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="font-mono text-xs">
+            <div className="flex items-center gap-1.5">
+              <Badge variant="outline" className="font-mono text-[10px]">
                 #{item.no}
               </Badge>
-              <Badge className={getStatusColor(item.status)}>
+              <Badge className={`text-[10px] ${getStatusColor(item.status)}`}>
                 {item.status}
               </Badge>
             </div>
-            <ArrowUpRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <ArrowUpRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Package className="w-4 h-4" />
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-0.5">
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <Package className="w-3 h-3" />
                 <span>Product</span>
               </div>
-              <p className="font-medium">{item.jenisBarang || "N/A"}</p>
+              <p className="text-xs font-medium truncate">{item.jenisBarang || "N/A"}</p>
             </div>
-            <div className="space-y-1">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Weight className="w-4 h-4" />
+            <div className="space-y-0.5">
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <Weight className="w-3 h-3" />
                 <span>Weight</span>
               </div>
-              <p className="font-medium">{item.berat} ton</p>
+              <p className="text-xs font-medium">{item.berat} ton</p>
             </div>
           </div>
 
-          <div className="pt-2 border-t space-y-2">
-            <div className="flex items-center gap-2 text-sm">
-              <Calendar className="w-4 h-4 text-muted-foreground" />
-              <span>{item.tanggalPengiriman}</span>
+          <div className="pt-2 border-t space-y-1.5">
+            <div className="flex items-center gap-1.5 text-xs">
+              <Calendar className="w-3 h-3 text-muted-foreground" />
+              <span className="truncate">{item.tanggalPengiriman}</span>
             </div>
-            <div className="flex items-center gap-2 text-sm">
-              <Building className="w-4 h-4 text-muted-foreground" />
-              <span>{item.namaPengirim || "N/A"}</span>
+            <div className="flex items-center gap-1.5 text-xs">
+              <Building className="w-3 h-3 text-muted-foreground" />
+              <span className="truncate">{item.namaPengirim || "N/A"}</span>
             </div>
           </div>
 
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-end gap-1.5">
             {!exists ? (
               <button
                 onClick={(e) => { e.stopPropagation(); handleSave(); }}
-                className="text-xs px-2 py-1 rounded-md bg-primary/10 hover:bg-primary/20 transition-colors flex items-center gap-1"
+                className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 hover:bg-primary/20 transition-colors flex items-center gap-1"
               >
-                <Save className="w-3 h-3" />
+                <Save className="w-2.5 h-2.5" />
                 Save
               </button>
             ) : (
               <button
                 onClick={(e) => { e.stopPropagation(); handleUpdate(); }}
-                className="text-xs px-2 py-1 rounded-md bg-primary/10 hover:bg-primary/20 transition-colors flex items-center gap-1"
+                className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 hover:bg-primary/20 transition-colors flex items-center gap-1"
               >
-                <RefreshCw className="w-3 h-3" />
+                <RefreshCw className="w-2.5 h-2.5" />
                 Update
               </button>
             )}

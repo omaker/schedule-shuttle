@@ -114,7 +114,7 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
       <ScrollArea className="h-[calc(100vh-16rem)]">
         <div className={`
           ${view === "grid" 
-            ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-4" 
+            ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3" 
             : "flex flex-col gap-4"}
           p-4
         `}>
