@@ -95,11 +95,31 @@ export const ShippingTable = ({ data, showCombinedData = false }: ShippingTableP
   }
 
   const filteredDbData = filterData(dbData);
-  // Filter out Excel data that already exists in the database
   const newExcelData = data.filter(excelRow => 
     !dbData.some(dbRow => dbRow.excel_id === excelRow["EXCEL ID"])
   );
   const filteredExcelData = filterData(newExcelData);
+
+  const handleDelete = async () => {
+    // Refresh the data after deletion
+    if (showCombinedData) {
+      const { data: schedules, error } = await supabase
+        .from('shipping_schedules')
+        .select('*');
+
+      if (error) {
+        console.error("Error fetching data:", error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to fetch shipping schedules",
+        });
+        return;
+      }
+
+      setDbData(schedules);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -156,6 +176,8 @@ export const ShippingTable = ({ data, showCombinedData = false }: ShippingTableP
                   item={mapRowToShippingItem(row)}
                   getStatusColor={getStatusColor}
                   view={view}
+                  onDelete={handleDelete}
+                  onUpdate={handleDelete}
                 />
               ))}
             </div>
