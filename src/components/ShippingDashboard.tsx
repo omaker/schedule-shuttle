@@ -13,8 +13,15 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import { Loader2, Package, Ship, Calendar } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Loader2, Package, Ship, Calendar, Search } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   Pagination,
   PaginationContent,
@@ -23,6 +30,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { Input } from "@/components/ui/input";
 
 export const ShippingDashboard = () => {
   const [data, setData] = useState<any[]>([]);
@@ -31,7 +39,8 @@ export const ShippingDashboard = () => {
   const [totalWeight, setTotalWeight] = useState(0);
   const [statusDistribution, setStatusDistribution] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const [searchTerm, setSearchTerm] = useState("");
+  const itemsPerPage = 10;
 
   const COLORS = ['#2a9d8f', '#e9c46a', '#f4a261', '#e76f51'];
 
@@ -75,10 +84,18 @@ export const ShippingDashboard = () => {
     fetchData();
   }, []);
 
-  const totalPages = Math.ceil(data.length / itemsPerPage);
+  const filteredData = data.filter((item) =>
+    Object.values(item).some(
+      (value) =>
+        value &&
+        value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  );
+
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentData = data.slice(startIndex, endIndex);
+  const currentData = filteredData.slice(startIndex, endIndex);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -163,21 +180,49 @@ export const ShippingDashboard = () => {
         <Card className="p-6">
           <h3 className="text-lg font-semibold mb-4 text-gray-900">Shipment List</h3>
           <div className="space-y-4">
-            {currentData.map((shipment, index) => (
-              <Card key={index} className="p-4 border-mint-100">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">{shipment.product || 'N/A'}</p>
-                    <p className="text-xs text-gray-500">{shipment.company || 'N/A'}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-medium text-mint-600">{shipment.plan_qty || 0} tons</p>
-                    <p className="text-xs text-gray-500">{shipment.loading_status || 'N/A'}</p>
-                  </div>
-                </div>
-              </Card>
-            ))}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
+              <Input
+                placeholder="Search shipments..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
             
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Product</TableHead>
+                    <TableHead>Company</TableHead>
+                    <TableHead>Weight (tons)</TableHead>
+                    <TableHead>Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {currentData.map((shipment, index) => (
+                    <TableRow key={index}>
+                      <TableCell className="font-medium">{shipment.product || 'N/A'}</TableCell>
+                      <TableCell>{shipment.company || 'N/A'}</TableCell>
+                      <TableCell>{shipment.plan_qty?.toLocaleString() || '0'}</TableCell>
+                      <TableCell>
+                        <span className={`px-2 py-1 rounded-full text-xs
+                          ${shipment.loading_status?.toLowerCase() === 'complete' 
+                            ? 'bg-green-100 text-green-800'
+                            : shipment.loading_status?.toLowerCase() === 'in progress'
+                            ? 'bg-blue-100 text-blue-800'
+                            : 'bg-gray-100 text-gray-800'
+                          }`}>
+                          {shipment.loading_status || 'N/A'}
+                        </span>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+
             <Pagination>
               <PaginationContent>
                 <PaginationItem>
