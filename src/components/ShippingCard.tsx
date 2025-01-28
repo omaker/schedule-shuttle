@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ShippingItem } from "@/types/shipping";
-import { Ship, Weight, Calendar, Save, RefreshCw, ChevronRight, ChevronDown, Package } from "lucide-react";
+import { Ship, Weight, Calendar, Save, RefreshCw, ChevronRight, ChevronDown, Package, Building, MapPin, Anchor, Clock } from "lucide-react";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -221,18 +221,65 @@ export const ShippingCard = ({ item, getStatusColor, view }: ShippingCardProps) 
           </div>
         </Card>
       </HoverCardTrigger>
-      <HoverCardContent className="w-80 p-4">
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-xs font-medium text-gray-500 mb-1">Pengirim:</p>
-              <p className="text-sm font-medium">{item.namaPengirim || "Tidak ada data"}</p>
-              <p className="text-sm text-gray-600">{item.alamatPengirim || "Tidak ada data"}</p>
+      <HoverCardContent className="w-96 p-6">
+        <div className="space-y-6">
+          <div>
+            <h3 className="text-lg font-semibold mb-2 text-mint-800">Detail Pengiriman #{item.no}</h3>
+            <Badge className={`${getStatusColor(item.status)} flex items-center gap-1.5 w-fit`}>
+              <Ship className="w-3 h-3" />
+              {item.status}
+            </Badge>
+          </div>
+
+          <div className="grid grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <div>
+                <p className="text-xs font-medium text-gray-500 mb-1">Pengirim:</p>
+                <div className="flex items-start gap-2">
+                  <Building className="w-4 h-4 text-mint-600 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-medium">{item.namaPengirim || "Tidak ada data"}</p>
+                    <p className="text-sm text-gray-600">{item.alamatPengirim || "Tidak ada data"}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-xs font-medium text-gray-500 mb-1">Penerima:</p>
+                <div className="flex items-start gap-2">
+                  <MapPin className="w-4 h-4 text-mint-600 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-medium">{item.namaPenerima || "Tidak ada data"}</p>
+                    <p className="text-sm text-gray-600">{item.alamatPenerima || "Tidak ada data"}</p>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div>
-              <p className="text-xs font-medium text-gray-500 mb-1">Penerima:</p>
-              <p className="text-sm font-medium">{item.namaPenerima || "Tidak ada data"}</p>
-              <p className="text-sm text-gray-600">{item.alamatPenerima || "Tidak ada data"}</p>
+
+            <div className="space-y-4">
+              <div>
+                <p className="text-xs font-medium text-gray-500 mb-1">Produk:</p>
+                <div className="flex items-center gap-2">
+                  <Package className="w-4 h-4 text-mint-600" />
+                  <p className="text-sm font-medium">{item.jenisBarang || "Tidak ada data"}</p>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-xs font-medium text-gray-500 mb-1">Berat:</p>
+                <div className="flex items-center gap-2">
+                  <Weight className="w-4 h-4 text-mint-600" />
+                  <p className="text-sm font-medium">{item.berat} ton</p>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-xs font-medium text-gray-500 mb-1">Tanggal Pengiriman:</p>
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-mint-600" />
+                  <p className="text-sm font-medium">{item.tanggalPengiriman}</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
