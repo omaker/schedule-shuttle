@@ -13,7 +13,7 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import { Loader2, Package, Ship, Calendar, Search } from "lucide-react";
+import { Loader2, Package, Ship, Calendar, Search, Plus, Edit, Trash } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -31,6 +31,19 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { EditShippingModal } from "./EditShippingModal";
+import { useToast } from "@/hooks/use-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export const ShippingDashboard = () => {
   const [data, setData] = useState<any[]>([]);
@@ -40,49 +53,94 @@ export const ShippingDashboard = () => {
   const [statusDistribution, setStatusDistribution] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [editingItem, setEditingItem] = useState<any>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<any>(null);
+  const { toast } = useToast();
   const itemsPerPage = 10;
 
   const COLORS = ['#2a9d8f', '#e9c46a', '#f4a261', '#e76f51'];
 
+  const fetchData = async () => {
+    try {
+      console.log('Fetching shipping data...');
+      const { data: shipments, error } = await supabase
+        .from('shipping_schedules')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      console.log('Fetched shipping data:', shipments);
+      setData(shipments || []);
+      setTotalShipments(shipments?.length || 0);
+
+      const total = shipments?.reduce((acc, curr) => acc + (Number(curr.plan_qty) || 0), 0);
+      setTotalWeight(Math.round(total));
+
+      const statusCount = shipments?.reduce((acc: any, curr) => {
+        const status = curr.loading_status || 'Unknown';
+        acc[status] = (acc[status] || 0) + 1;
+        return acc;
+      }, {});
+
+      const statusData = Object.entries(statusCount).map(([name, value]) => ({
+        name,
+        value,
+      }));
+
+      setStatusDistribution(statusData);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to fetch shipping data",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        console.log('Fetching shipping data...');
-        const { data: shipments, error } = await supabase
-          .from('shipping_schedules')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (error) throw error;
-
-        console.log('Fetched shipping data:', shipments);
-        setData(shipments || []);
-        setTotalShipments(shipments?.length || 0);
-
-        const total = shipments?.reduce((acc, curr) => acc + (Number(curr.plan_qty) || 0), 0);
-        setTotalWeight(Math.round(total));
-
-        const statusCount = shipments?.reduce((acc: any, curr) => {
-          const status = curr.loading_status || 'Unknown';
-          acc[status] = (acc[status] || 0) + 1;
-          return acc;
-        }, {});
-
-        const statusData = Object.entries(statusCount).map(([name, value]) => ({
-          name,
-          value,
-        }));
-
-        setStatusDistribution(statusData);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchData();
   }, []);
+
+  const handleEdit = (item: any) => {
+    setEditingItem(item);
+    setIsEditModalOpen(true);
+  };
+
+  const handleDelete = async (item: any) => {
+    try {
+      const { error } = await supabase
+        .from('shipping_schedules')
+        .delete()
+        .eq('excel_id', item.excel_id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Shipping record deleted successfully",
+      });
+      fetchData();
+    } catch (error) {
+      console.error('Error deleting record:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete shipping record",
+      });
+    }
+    setDeleteConfirmOpen(false);
+  };
+
+  const confirmDelete = (item: any) => {
+    setItemToDelete(item);
+    setDeleteConfirmOpen(true);
+  };
 
   const filteredData = data.filter((item) =>
     Object.values(item).some(
@@ -108,6 +166,8 @@ export const ShippingDashboard = () => {
       </div>
     );
   }
+
+  // ... keep existing code (Stats Cards Section and Charts Section)
 
   return (
     <div className="space-y-6">
@@ -203,14 +263,20 @@ export const ShippingDashboard = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-gray-900">Complete Shipment Data</h3>
-            <div className="relative w-72">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
-              <Input
-                placeholder="Search shipments..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
+            <div className="flex items-center gap-4">
+              <div className="relative w-72">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
+                <Input
+                  placeholder="Search shipments..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <Button className="bg-mint-600 hover:bg-mint-700">
+                <Plus className="h-4 w-4 mr-2" />
+                Add New
+              </Button>
             </div>
           </div>
           
@@ -224,6 +290,7 @@ export const ShippingDashboard = () => {
                   <TableHead>Weight (tons)</TableHead>
                   <TableHead>Country</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -244,6 +311,26 @@ export const ShippingDashboard = () => {
                         }`}>
                         {shipment.loading_status || 'N/A'}
                       </span>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => handleEdit(shipment)}
+                          className="h-8 w-8"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => confirmDelete(shipment)}
+                          className="h-8 w-8 text-red-500 hover:text-red-600"
+                        >
+                          <Trash className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -286,6 +373,35 @@ export const ShippingDashboard = () => {
           </div>
         </div>
       </Card>
+
+      {/* Edit Modal */}
+      <EditShippingModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        item={editingItem}
+        onUpdate={fetchData}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the shipping record.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => itemToDelete && handleDelete(itemToDelete)}
+              className="bg-red-500 hover:bg-red-600"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
