@@ -114,62 +114,62 @@ export const ShippingCard = ({ item, getStatusColor, view }: ShippingCardProps) 
         className="relative group cursor-pointer overflow-hidden"
         onClick={() => navigate(`/shipping/${item.no}`)}
       >
-        <div className="p-3 space-y-3">
+        <div className="p-4 space-y-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              <Badge variant="outline" className="font-mono text-[10px]">
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="font-mono text-xs">
                 #{item.no}
               </Badge>
-              <Badge className={`text-[10px] ${getStatusColor(item.status)}`}>
+              <Badge className={`text-xs ${getStatusColor(item.status)}`}>
                 {item.status}
               </Badge>
             </div>
-            <ArrowUpRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <ArrowUpRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-0.5">
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <Package className="w-3 h-3" />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Package className="w-4 h-4" />
                 <span>Product</span>
               </div>
-              <p className="text-xs font-medium truncate">{item.jenisBarang || "N/A"}</p>
+              <p className="text-sm font-medium truncate">{item.jenisBarang || "N/A"}</p>
             </div>
-            <div className="space-y-0.5">
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <Weight className="w-3 h-3" />
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Weight className="w-4 h-4" />
                 <span>Weight</span>
               </div>
-              <p className="text-xs font-medium">{item.berat} ton</p>
+              <p className="text-sm font-medium">{item.berat} ton</p>
             </div>
           </div>
 
-          <div className="pt-2 border-t space-y-1.5">
-            <div className="flex items-center gap-1.5 text-xs">
-              <Calendar className="w-3 h-3 text-muted-foreground" />
+          <div className="pt-2 border-t space-y-2">
+            <div className="flex items-center gap-2 text-sm">
+              <Calendar className="w-4 h-4 text-muted-foreground" />
               <span className="truncate">{item.tanggalPengiriman}</span>
             </div>
-            <div className="flex items-center gap-1.5 text-xs">
-              <Building className="w-3 h-3 text-muted-foreground" />
+            <div className="flex items-center gap-2 text-sm">
+              <Building className="w-4 h-4 text-muted-foreground" />
               <span className="truncate">{item.namaPengirim || "N/A"}</span>
             </div>
           </div>
 
-          <div className="flex justify-end gap-1.5">
+          <div className="flex justify-end gap-2">
             {!exists ? (
               <button
                 onClick={(e) => { e.stopPropagation(); handleSave(); }}
-                className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 hover:bg-primary/20 transition-colors flex items-center gap-1"
+                className="text-xs px-2 py-1 rounded bg-primary/10 hover:bg-primary/20 transition-colors flex items-center gap-1.5"
               >
-                <Save className="w-2.5 h-2.5" />
+                <Save className="w-3 h-3" />
                 Save
               </button>
             ) : (
               <button
                 onClick={(e) => { e.stopPropagation(); handleUpdate(); }}
-                className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 hover:bg-primary/20 transition-colors flex items-center gap-1"
+                className="text-xs px-2 py-1 rounded bg-primary/10 hover:bg-primary/20 transition-colors flex items-center gap-1.5"
               >
-                <RefreshCw className="w-2.5 h-2.5" />
+                <RefreshCw className="w-3 h-3" />
                 Update
               </button>
             )}
@@ -181,12 +181,12 @@ export const ShippingCard = ({ item, getStatusColor, view }: ShippingCardProps) 
 
   return (
     <Card 
-      className="relative group cursor-pointer overflow-hidden"
+      className="relative group cursor-pointer overflow-hidden h-full"
       onClick={handleCardClick}
     >
-      <div className="p-6 space-y-6">
+      <div className="p-5 space-y-5">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <Badge variant="outline" className="font-mono">
               #{item.no}
             </Badge>
@@ -198,47 +198,43 @@ export const ShippingCard = ({ item, getStatusColor, view }: ShippingCardProps) 
           <ArrowUpRight className="w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity" />
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Package className="w-4 h-4" />
-                <span>Product Details</span>
-              </div>
-              <p className="text-lg font-medium">{item.jenisBarang || "N/A"}</p>
-              <div className="flex items-center gap-2">
-                <Weight className="w-4 h-4 text-muted-foreground" />
-                <span>{item.berat} ton</span>
-              </div>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Package className="w-4 h-4" />
+              <span>Product Details</span>
             </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Calendar className="w-4 h-4" />
-                <span>Shipping Schedule</span>
-              </div>
-              <p className="font-medium">{item.tanggalPengiriman}</p>
+            <p className="text-base font-medium line-clamp-2">{item.jenisBarang || "N/A"}</p>
+            <div className="flex items-center gap-2 text-sm">
+              <Weight className="w-4 h-4 text-muted-foreground" />
+              <span>{item.berat} ton</span>
             </div>
           </div>
 
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Building className="w-4 h-4" />
-                <span>Sender</span>
-              </div>
-              <p className="font-medium">{item.namaPengirim || "N/A"}</p>
-              <p className="text-sm text-muted-foreground">{item.alamatPengirim || "N/A"}</p>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Calendar className="w-4 h-4" />
+              <span>Shipping Schedule</span>
             </div>
+            <p className="text-sm font-medium">{item.tanggalPengiriman}</p>
+          </div>
 
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <MapPin className="w-4 h-4" />
-                <span>Recipient</span>
-              </div>
-              <p className="font-medium">{item.namaPenerima || "N/A"}</p>
-              <p className="text-sm text-muted-foreground">{item.alamatPenerima || "N/A"}</p>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Building className="w-4 h-4" />
+              <span>Sender</span>
             </div>
+            <p className="text-sm font-medium line-clamp-1">{item.namaPengirim || "N/A"}</p>
+            <p className="text-sm text-muted-foreground line-clamp-1">{item.alamatPengirim || "N/A"}</p>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <MapPin className="w-4 h-4" />
+              <span>Recipient</span>
+            </div>
+            <p className="text-sm font-medium line-clamp-1">{item.namaPenerima || "N/A"}</p>
+            <p className="text-sm text-muted-foreground line-clamp-1">{item.alamatPenerima || "N/A"}</p>
           </div>
         </div>
 
@@ -246,7 +242,7 @@ export const ShippingCard = ({ item, getStatusColor, view }: ShippingCardProps) 
           {!exists ? (
             <button
               onClick={(e) => { e.stopPropagation(); handleSave(); }}
-              className="px-3 py-1.5 rounded-md bg-primary/10 hover:bg-primary/20 transition-colors flex items-center gap-2"
+              className="px-3 py-1.5 rounded-md bg-primary/10 hover:bg-primary/20 transition-colors flex items-center gap-2 text-sm"
             >
               <Save className="w-4 h-4" />
               Save to Database
@@ -254,7 +250,7 @@ export const ShippingCard = ({ item, getStatusColor, view }: ShippingCardProps) 
           ) : (
             <button
               onClick={(e) => { e.stopPropagation(); handleUpdate(); }}
-              className="px-3 py-1.5 rounded-md bg-primary/10 hover:bg-primary/20 transition-colors flex items-center gap-2"
+              className="px-3 py-1.5 rounded-md bg-primary/10 hover:bg-primary/20 transition-colors flex items-center gap-2 text-sm"
             >
               <RefreshCw className="w-4 h-4" />
               Update Data
