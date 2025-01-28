@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ShippingCard } from "./ShippingCard";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface ShippingTableProps {
   data: any[];
@@ -44,7 +45,6 @@ export const ShippingTable = ({ data, showCombinedData = false }: ShippingTableP
       }
     };
 
-    // Only fetch database data if we're showing combined data (after Excel upload)
     if (showCombinedData) {
       fetchData();
     } else {
@@ -52,14 +52,12 @@ export const ShippingTable = ({ data, showCombinedData = false }: ShippingTableP
     }
   }, [toast, showCombinedData]);
 
-  // Use either combined data or just database data based on showCombinedData prop
-  const displayData = showCombinedData ? [...dbData, ...data] : [];
-
-  const filteredData = displayData.filter(row => 
-    Object.values(row).some(value => 
-      value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  );
+  const filterData = (dataArray: any[]) => 
+    dataArray.filter(row => 
+      Object.values(row).some(value => 
+        value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
 
   const getStatusColor = (status: string) => {
     switch (status?.toLowerCase()) {
@@ -87,6 +85,17 @@ export const ShippingTable = ({ data, showCombinedData = false }: ShippingTableP
       </div>
     );
   }
+
+  if (!showCombinedData) {
+    return (
+      <div className="flex items-center justify-center h-64 text-muted-foreground">
+        Please upload an Excel file to view shipping schedules.
+      </div>
+    );
+  }
+
+  const filteredDbData = filterData(dbData);
+  const filteredExcelData = filterData(data);
 
   return (
     <div className="space-y-6">
@@ -120,30 +129,61 @@ export const ShippingTable = ({ data, showCombinedData = false }: ShippingTableP
         </div>
       </div>
 
-      <ScrollArea className="h-[calc(100vh-16rem)]">
-        <div className={`
-          ${view === "grid" 
-            ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4" 
-            : "flex flex-col gap-4 p-4"}
-        `}>
-          {filteredData.map((row, index) => (
-            <ShippingCard
-              key={index}
-              item={mapRowToShippingItem(row)}
-              getStatusColor={getStatusColor}
-              view={view}
-            />
-          ))}
-        </div>
-        <ScrollBar orientation="vertical" />
-      </ScrollArea>
+      <Tabs defaultValue="database" className="w-full">
+        <TabsList className="w-full grid grid-cols-2">
+          <TabsTrigger value="database">
+            Database Records ({filteredDbData.length})
+          </TabsTrigger>
+          <TabsTrigger value="excel">
+            New Excel Data ({filteredExcelData.length})
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="database">
+          <ScrollArea className="h-[calc(100vh-22rem)]">
+            <div className={`
+              ${view === "grid" 
+                ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4" 
+                : "flex flex-col gap-4 p-4"}
+            `}>
+              {filteredDbData.map((row, index) => (
+                <ShippingCard
+                  key={index}
+                  item={mapRowToShippingItem(row)}
+                  getStatusColor={getStatusColor}
+                  view={view}
+                />
+              ))}
+            </div>
+            <ScrollBar orientation="vertical" />
+          </ScrollArea>
+        </TabsContent>
+
+        <TabsContent value="excel">
+          <ScrollArea className="h-[calc(100vh-22rem)]">
+            <div className={`
+              ${view === "grid" 
+                ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4" 
+                : "flex flex-col gap-4 p-4"}
+            `}>
+              {filteredExcelData.map((row, index) => (
+                <ShippingCard
+                  key={index}
+                  item={mapRowToShippingItem(row)}
+                  getStatusColor={getStatusColor}
+                  view={view}
+                />
+              ))}
+            </div>
+            <ScrollBar orientation="vertical" />
+          </ScrollArea>
+        </TabsContent>
+      </Tabs>
 
       <div className="flex items-center justify-between p-4 rounded-lg border bg-card">
         <span className="text-sm text-muted-foreground">
-          {showCombinedData 
-            ? `Showing ${filteredData.length} items (${dbData.length} from database, ${data.length} from Excel)`
-            : `No data to display. Please upload an Excel file.`
-          }
+          Total: {filteredDbData.length + filteredExcelData.length} items
+          ({filteredDbData.length} from database, {filteredExcelData.length} from Excel)
         </span>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Filter className="h-4 w-4" />
