@@ -15,6 +15,14 @@ import {
 } from "recharts";
 import { Loader2, Package, Ship, Calendar } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 export const ShippingDashboard = () => {
   const [data, setData] = useState<any[]>([]);
@@ -22,6 +30,8 @@ export const ShippingDashboard = () => {
   const [totalShipments, setTotalShipments] = useState(0);
   const [totalWeight, setTotalWeight] = useState(0);
   const [statusDistribution, setStatusDistribution] = useState<any[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   const COLORS = ['#2a9d8f', '#e9c46a', '#f4a261', '#e76f51'];
 
@@ -64,6 +74,15 @@ export const ShippingDashboard = () => {
 
     fetchData();
   }, []);
+
+  const totalPages = Math.ceil(data.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentData = data.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   if (isLoading) {
     return (
@@ -142,25 +161,52 @@ export const ShippingDashboard = () => {
         </Card>
 
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900">Recent Shipments</h3>
-          <ScrollArea className="h-[300px] w-full">
-            <div className="space-y-4">
-              {data.slice(0, 5).map((shipment, index) => (
-                <Card key={index} className="p-4 border-mint-100">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">{shipment.product || 'N/A'}</p>
-                      <p className="text-xs text-gray-500">{shipment.company || 'N/A'}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-medium text-mint-600">{shipment.plan_qty || 0} tons</p>
-                      <p className="text-xs text-gray-500">{shipment.loading_status || 'N/A'}</p>
-                    </div>
+          <h3 className="text-lg font-semibold mb-4 text-gray-900">Shipment List</h3>
+          <div className="space-y-4">
+            {currentData.map((shipment, index) => (
+              <Card key={index} className="p-4 border-mint-100">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">{shipment.product || 'N/A'}</p>
+                    <p className="text-xs text-gray-500">{shipment.company || 'N/A'}</p>
                   </div>
-                </Card>
-              ))}
-            </div>
-          </ScrollArea>
+                  <div className="text-right">
+                    <p className="text-sm font-medium text-mint-600">{shipment.plan_qty || 0} tons</p>
+                    <p className="text-xs text-gray-500">{shipment.loading_status || 'N/A'}</p>
+                  </div>
+                </div>
+              </Card>
+            ))}
+            
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
+                  />
+                </PaginationItem>
+                
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <PaginationItem key={page}>
+                    <PaginationLink
+                      onClick={() => handlePageChange(page)}
+                      isActive={currentPage === page}
+                    >
+                      {page}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+                
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    className={currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
         </Card>
       </div>
     </div>
