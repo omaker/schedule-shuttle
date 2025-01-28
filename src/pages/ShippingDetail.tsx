@@ -9,22 +9,45 @@ import {
   BarChart, FileText, Globe, Truck, Calculator, Scale
 } from "lucide-react";
 import { Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const ShippingDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { toast } = useToast();
 
-  const { data: shipping, isLoading } = useQuery({
+  const { data: shipping, isLoading, isError } = useQuery({
     queryKey: ['shipping', id],
     queryFn: async () => {
+      console.log('Fetching shipping details for ID:', id);
       const { data, error } = await supabase
         .from('shipping_schedules')
         .select('*')
         .eq('excel_id', id)
-        .single();
+        .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching shipping details:', error);
+        throw error;
+      }
+
+      if (!data) {
+        console.log('No shipping data found for ID:', id);
+        throw new Error('Shipping schedule not found');
+      }
+
+      console.log('Shipping data retrieved:', data);
       return data;
+    },
+    meta: {
+      onError: (error: Error) => {
+        console.error('Query error:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load shipping details. The schedule might not exist.",
+        });
+      }
     }
   });
 
@@ -51,6 +74,32 @@ const ShippingDetail = () => {
     return (
       <div className="flex items-center justify-center h-screen">
         <Loader2 className="h-8 w-8 animate-spin text-mint-600" />
+      </div>
+    );
+  }
+
+  if (isError || !shipping) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-mint-50 to-mint-100 p-8">
+        <div className="max-w-7xl mx-auto">
+          <Button 
+            onClick={() => navigate(-1)} 
+            variant="outline" 
+            className="mb-6 bg-white hover:bg-gray-50"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Kembali
+          </Button>
+          
+          <div className="bg-white rounded-xl shadow-sm p-6 text-center">
+            <h1 className="text-2xl font-semibold mb-4 text-mint-800">
+              Shipping Schedule Not Found
+            </h1>
+            <p className="text-gray-600">
+              The shipping schedule you're looking for doesn't exist or has been removed.
+            </p>
+          </div>
+        </div>
       </div>
     );
   }
