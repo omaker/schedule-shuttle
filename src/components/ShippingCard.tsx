@@ -225,154 +225,184 @@ export const ShippingCard = ({ item, getStatusColor, view }: ShippingCardProps) 
           </div>
         </Card>
       </HoverCardTrigger>
-      <HoverCardContent className="w-[800px] p-6">
-        <div className="space-y-6">
+      <HoverCardContent className="w-[800px] p-4">
+        <div className="space-y-4">
           <div>
-            <h3 className="text-lg font-semibold mb-2 text-mint-800">Detail Pengiriman #{item.no}</h3>
-            <Badge className={`${getStatusColor(item.status)} flex items-center gap-1.5 w-fit`}>
+            <h3 className="text-base font-semibold mb-1 text-mint-800">Detail Pengiriman #{item.no}</h3>
+            <Badge className={`${getStatusColor(item.status)} flex items-center gap-1.5 w-fit text-xs`}>
               <Ship className="w-3 h-3" />
               {item.status}
             </Badge>
           </div>
 
-          <div className="grid grid-cols-3 gap-8">
+          <div className="grid grid-cols-4 gap-4 text-xs">
             {/* Informasi Dasar */}
-            <div className="space-y-4">
-              <h4 className="font-medium text-mint-700 border-b pb-2">Informasi Dasar</h4>
+            <div className="space-y-3">
+              <h4 className="font-medium text-mint-700 border-b pb-1 text-sm">Informasi Dasar</h4>
               <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Produk:</p>
-                <div className="flex items-center gap-2">
-                  <Package className="w-4 h-4 text-mint-600" />
-                  <p className="text-sm font-medium">{item.jenisBarang || "Tidak ada data"}</p>
+                <p className="text-[11px] font-medium text-gray-500 mb-0.5">Produk:</p>
+                <div className="flex items-center gap-1.5">
+                  <Package className="w-3 h-3 text-mint-600" />
+                  <p className="font-medium">{item.jenisBarang || "Tidak ada data"}</p>
                 </div>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Berat:</p>
-                <div className="flex items-center gap-2">
-                  <Weight className="w-4 h-4 text-mint-600" />
-                  <p className="text-sm font-medium">{item.berat} ton</p>
+                <p className="text-[11px] font-medium text-gray-500 mb-0.5">Berat:</p>
+                <div className="flex items-center gap-1.5">
+                  <Weight className="w-3 h-3 text-mint-600" />
+                  <p className="font-medium">{item.berat} ton</p>
                 </div>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Status:</p>
-                <div className="flex items-center gap-2">
-                  <Info className="w-4 h-4 text-mint-600" />
-                  <p className="text-sm font-medium">{item.status}</p>
+                <p className="text-[11px] font-medium text-gray-500 mb-0.5">Status:</p>
+                <div className="flex items-center gap-1.5">
+                  <Info className="w-3 h-3 text-mint-600" />
+                  <p className="font-medium">{item.status}</p>
                 </div>
               </div>
             </div>
 
             {/* Informasi Pengiriman */}
-            <div className="space-y-4">
-              <h4 className="font-medium text-mint-700 border-b pb-2">Informasi Pengiriman</h4>
+            <div className="space-y-3">
+              <h4 className="font-medium text-mint-700 border-b pb-1 text-sm">Informasi Pengiriman</h4>
               <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Pengirim:</p>
-                <div className="flex items-start gap-2">
-                  <Building className="w-4 h-4 text-mint-600 mt-0.5" />
+                <p className="text-[11px] font-medium text-gray-500 mb-0.5">Pengirim:</p>
+                <div className="flex items-start gap-1.5">
+                  <Building className="w-3 h-3 text-mint-600 mt-0.5" />
                   <div>
-                    <p className="text-sm font-medium">{item.namaPengirim || "Tidak ada data"}</p>
-                    <p className="text-sm text-gray-600">{item.alamatPengirim || "Tidak ada data"}</p>
+                    <p className="font-medium">{item.namaPengirim || "Tidak ada data"}</p>
+                    <p className="text-gray-600">{item.alamatPengirim || "Tidak ada data"}</p>
                   </div>
                 </div>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Penerima:</p>
-                <div className="flex items-start gap-2">
-                  <MapPin className="w-4 h-4 text-mint-600 mt-0.5" />
+                <p className="text-[11px] font-medium text-gray-500 mb-0.5">Penerima:</p>
+                <div className="flex items-start gap-1.5">
+                  <MapPin className="w-3 h-3 text-mint-600 mt-0.5" />
                   <div>
-                    <p className="text-sm font-medium">{item.namaPenerima || "Tidak ada data"}</p>
-                    <p className="text-sm text-gray-600">{item.alamatPenerima || "Tidak ada data"}</p>
+                    <p className="font-medium">{item.namaPenerima || "Tidak ada data"}</p>
+                    <p className="text-gray-600">{item.alamatPenerima || "Tidak ada data"}</p>
                   </div>
-                </div>
-              </div>
-              <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Tanggal Pengiriman:</p>
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-mint-600" />
-                  <p className="text-sm font-medium">{item.tanggalPengiriman}</p>
                 </div>
               </div>
             </div>
 
             {/* Detail Tambahan */}
-            <div className="space-y-4">
-              <h4 className="font-medium text-mint-700 border-b pb-2">Detail Tambahan</h4>
+            <div className="space-y-3">
+              <h4 className="font-medium text-mint-700 border-b pb-1 text-sm">Detail Tambahan</h4>
               <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Tahun:</p>
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-mint-600" />
-                  <p className="text-sm font-medium">{item.year || "Tidak ada data"}</p>
+                <p className="text-[11px] font-medium text-gray-500 mb-0.5">Tahun:</p>
+                <div className="flex items-center gap-1.5">
+                  <Calendar className="w-3 h-3 text-mint-600" />
+                  <p className="font-medium">{item.year || "Tidak ada data"}</p>
                 </div>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Bulan:</p>
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-mint-600" />
-                  <p className="text-sm font-medium">{item.month || "Tidak ada data"}</p>
+                <p className="text-[11px] font-medium text-gray-500 mb-0.5">Bulan:</p>
+                <div className="flex items-center gap-1.5">
+                  <Calendar className="w-3 h-3 text-mint-600" />
+                  <p className="font-medium">{item.month || "Tidak ada data"}</p>
                 </div>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Fin Month:</p>
-                <div className="flex items-center gap-2">
-                  <Calculator className="w-4 h-4 text-mint-600" />
-                  <p className="text-sm font-medium">{item.finMonth || "Tidak ada data"}</p>
+                <p className="text-[11px] font-medium text-gray-500 mb-0.5">Fin Month:</p>
+                <div className="flex items-center gap-1.5">
+                  <Calculator className="w-3 h-3 text-mint-600" />
+                  <p className="font-medium">{item.finMonth || "Tidak ada data"}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Informasi Kapal */}
+            <div className="space-y-3">
+              <h4 className="font-medium text-mint-700 border-b pb-1 text-sm">Informasi Kapal</h4>
+              <div>
+                <p className="text-[11px] font-medium text-gray-500 mb-0.5">Vessel:</p>
+                <div className="flex items-center gap-1.5">
+                  <Anchor className="w-3 h-3 text-mint-600" />
+                  <p className="font-medium">{item.vessel || "Tidak ada data"}</p>
+                </div>
+              </div>
+              <div>
+                <p className="text-[11px] font-medium text-gray-500 mb-0.5">Ship Code:</p>
+                <div className="flex items-center gap-1.5">
+                  <FileText className="w-3 h-3 text-mint-600" />
+                  <p className="font-medium">{item.shipCode || "Tidak ada data"}</p>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Additional Details */}
-          <div className="grid grid-cols-3 gap-8 pt-4 border-t">
-            <div className="space-y-4">
-              <h4 className="font-medium text-mint-700 border-b pb-2">Informasi Kapal</h4>
+          <div className="grid grid-cols-4 gap-4 pt-3 border-t text-xs">
+            <div className="space-y-3">
+              <h4 className="font-medium text-mint-700 border-b pb-1 text-sm">Informasi Region</h4>
               <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Vessel:</p>
-                <div className="flex items-center gap-2">
-                  <Anchor className="w-4 h-4 text-mint-600" />
-                  <p className="text-sm font-medium">{item.vessel || "Tidak ada data"}</p>
+                <p className="text-[11px] font-medium text-gray-500 mb-0.5">Region:</p>
+                <div className="flex items-center gap-1.5">
+                  <Globe className="w-3 h-3 text-mint-600" />
+                  <p className="font-medium">{item.region || "Tidak ada data"}</p>
                 </div>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Ship Code:</p>
-                <div className="flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-mint-600" />
-                  <p className="text-sm font-medium">{item.shipCode || "Tidak ada data"}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <h4 className="font-medium text-mint-700 border-b pb-2">Informasi Region</h4>
-              <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Region:</p>
-                <div className="flex items-center gap-2">
-                  <Globe className="w-4 h-4 text-mint-600" />
-                  <p className="text-sm font-medium">{item.region || "Tidak ada data"}</p>
-                </div>
-              </div>
-              <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Terminal:</p>
-                <div className="flex items-center gap-2">
-                  <Truck className="w-4 h-4 text-mint-600" />
-                  <p className="text-sm font-medium">{item.terminal || "Tidak ada data"}</p>
+                <p className="text-[11px] font-medium text-gray-500 mb-0.5">Terminal:</p>
+                <div className="flex items-center gap-1.5">
+                  <Truck className="w-3 h-3 text-mint-600" />
+                  <p className="font-medium">{item.terminal || "Tidak ada data"}</p>
                 </div>
               </div>
             </div>
 
-            <div className="space-y-4">
-              <h4 className="font-medium text-mint-700 border-b pb-2">Informasi Kontrak</h4>
+            <div className="space-y-3">
+              <h4 className="font-medium text-mint-700 border-b pb-1 text-sm">Informasi Kontrak</h4>
               <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Contract Period:</p>
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-mint-600" />
-                  <p className="text-sm font-medium">{item.contractPeriod || "Tidak ada data"}</p>
+                <p className="text-[11px] font-medium text-gray-500 mb-0.5">Contract Period:</p>
+                <div className="flex items-center gap-1.5">
+                  <Clock className="w-3 h-3 text-mint-600" />
+                  <p className="font-medium">{item.contractPeriod || "Tidak ada data"}</p>
                 </div>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Price Code:</p>
-                <div className="flex items-center gap-2">
-                  <DollarSign className="w-4 h-4 text-mint-600" />
-                  <p className="text-sm font-medium">{item.priceCode || "Tidak ada data"}</p>
+                <p className="text-[11px] font-medium text-gray-500 mb-0.5">Price Code:</p>
+                <div className="flex items-center gap-1.5">
+                  <DollarSign className="w-3 h-3 text-mint-600" />
+                  <p className="font-medium">{item.priceCode || "Tidak ada data"}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <h4 className="font-medium text-mint-700 border-b pb-1 text-sm">Informasi Harga</h4>
+              <div>
+                <p className="text-[11px] font-medium text-gray-500 mb-0.5">Price FOB:</p>
+                <div className="flex items-center gap-1.5">
+                  <DollarSign className="w-3 h-3 text-mint-600" />
+                  <p className="font-medium">{item.price_fob_vessel || "Tidak ada data"}</p>
+                </div>
+              </div>
+              <div>
+                <p className="text-[11px] font-medium text-gray-500 mb-0.5">Revenue:</p>
+                <div className="flex items-center gap-1.5">
+                  <BarChart className="w-3 h-3 text-mint-600" />
+                  <p className="font-medium">{item.revenue || "Tidak ada data"}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <h4 className="font-medium text-mint-700 border-b pb-1 text-sm">Informasi CV</h4>
+              <div>
+                <p className="text-[11px] font-medium text-gray-500 mb-0.5">CV Typical:</p>
+                <div className="flex items-center gap-1.5">
+                  <Scale className="w-3 h-3 text-mint-600" />
+                  <p className="font-medium">{item.cv_typical || "Tidak ada data"}</p>
+                </div>
+              </div>
+              <div>
+                <p className="text-[11px] font-medium text-gray-500 mb-0.5">CV Acceptable:</p>
+                <div className="flex items-center gap-1.5">
+                  <Scale className="w-3 h-3 text-mint-600" />
+                  <p className="font-medium">{item.cv_acceptable || "Tidak ada data"}</p>
                 </div>
               </div>
             </div>
