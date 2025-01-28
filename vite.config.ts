@@ -18,4 +18,12 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  optimizeDeps: {
+    include: ['react-dropzone']
+  },
+  build: {
+    commonjsOptions: {
+      include: [/node_modules/]
+    }
+  }
 }));
