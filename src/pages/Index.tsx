@@ -157,10 +157,9 @@ const Index = () => {
         <Upload className="w-8 h-8 text-mint-600" />
       </div>
       <div className="space-y-2">
-        <h3 className="text-xl font-semibold">No Excel Data Uploaded</h3>
+        <h3 className="text-xl font-semibold">Upload Excel File</h3>
         <p className="text-muted-foreground">
-          Upload an Excel file to see combined data with database records.
-          You can still view and manage existing database records below.
+          Please upload an Excel file to view and manage shipping schedules.
         </p>
       </div>
     </Card>
@@ -202,19 +201,11 @@ const Index = () => {
               </TabsContent>
               <TabsContent value="table">
                 {shippingData.length === 0 ? (
-                  <div className="space-y-6">
-                    <PreUploadView />
-                    <div className="mt-8">
-                      <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-                        Database Records
-                      </h2>
-                      <ShippingTable data={[]} showCombinedData={false} />
-                    </div>
-                  </div>
+                  <PreUploadView />
                 ) : (
                   <div>
                     <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-                      Combined Data
+                      Shipping Data
                     </h2>
                     <ShippingTable data={shippingData} showCombinedData={true} />
                   </div>
