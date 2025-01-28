@@ -2,12 +2,13 @@ import { useState } from "react";
 import { FileUpload } from "@/components/FileUpload";
 import { ShippingTable } from "@/components/ShippingTable";
 import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
+import { Download, Upload } from "lucide-react";
 import * as XLSX from "xlsx";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
 import { ShippingDashboard } from "@/components/ShippingDashboard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card } from "@/components/ui/card";
 
 const Index = () => {
   const [shippingData, setShippingData] = useState<any[]>(() => {
@@ -24,7 +25,6 @@ const Index = () => {
   };
 
   const handleDownloadTemplate = () => {
-    // Create template data with all columns
     const templateData = [
       {
         "EXCEL ID": "",
@@ -140,14 +140,9 @@ const Index = () => {
       }
     ];
 
-    // Create workbook and worksheet
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.json_to_sheet(templateData);
-
-    // Add worksheet to workbook
     XLSX.utils.book_append_sheet(wb, ws, "Template");
-
-    // Save file
     XLSX.writeFile(wb, "shipping_schedule_template.xlsx");
 
     toast({
@@ -155,6 +150,21 @@ const Index = () => {
       description: "Silakan isi template sesuai dengan format yang ada",
     });
   };
+
+  const PreUploadView = () => (
+    <Card className="p-8 text-center space-y-6">
+      <div className="mx-auto w-16 h-16 rounded-full bg-mint-100 flex items-center justify-center">
+        <Upload className="w-8 h-8 text-mint-600" />
+      </div>
+      <div className="space-y-2">
+        <h3 className="text-xl font-semibold">No Excel Data Uploaded</h3>
+        <p className="text-muted-foreground">
+          Upload an Excel file to see combined data with database records.
+          You can still view and manage existing database records below.
+        </p>
+      </div>
+    </Card>
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-mint-50 to-mint-100 py-12 px-4 sm:px-6 lg:px-8">
@@ -181,25 +191,37 @@ const Index = () => {
         <div className="space-y-8">
           <FileUpload onDataReceived={handleDataReceived} />
           
-          {shippingData.length > 0 && (
-            <div className="mt-8 animate-fade-in">
-              <Tabs defaultValue="dashboard" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-                  <TabsTrigger value="table">Table View</TabsTrigger>
-                </TabsList>
-                <TabsContent value="dashboard">
-                  <ShippingDashboard />
-                </TabsContent>
-                <TabsContent value="table">
-                  <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-                    Data Shipping Schedule
-                  </h2>
-                  <ShippingTable data={shippingData} />
-                </TabsContent>
-              </Tabs>
-            </div>
-          )}
+          <div className="mt-8 animate-fade-in">
+            <Tabs defaultValue="dashboard" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+                <TabsTrigger value="table">Table View</TabsTrigger>
+              </TabsList>
+              <TabsContent value="dashboard">
+                <ShippingDashboard />
+              </TabsContent>
+              <TabsContent value="table">
+                {shippingData.length === 0 ? (
+                  <div className="space-y-6">
+                    <PreUploadView />
+                    <div className="mt-8">
+                      <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                        Database Records
+                      </h2>
+                      <ShippingTable data={[]} />
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                      Combined Data
+                    </h2>
+                    <ShippingTable data={shippingData} />
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
+          </div>
         </div>
       </div>
     </div>
