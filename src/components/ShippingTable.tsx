@@ -46,7 +46,10 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
     fetchData();
   }, [toast]);
 
-  const filteredData = data.filter(row => 
+  // Combine database data with uploaded Excel data
+  const combinedData = [...dbData, ...data];
+
+  const filteredData = combinedData.filter(row => 
     Object.values(row).some(value => 
       value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
     )
@@ -131,7 +134,7 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
 
       <div className="flex items-center justify-between p-4 rounded-lg border bg-card">
         <span className="text-sm text-muted-foreground">
-          Showing {filteredData.length} of {data.length} entries
+          Showing {filteredData.length} items ({dbData.length} from database, {data.length} from Excel)
         </span>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Filter className="h-4 w-4" />
@@ -144,13 +147,13 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
 
 const mapRowToShippingItem = (row: any) => ({
   id: row["EXCEL ID"] || row.id || crypto.randomUUID(),
-  no: row["EXCEL ID"] || "",
-  status: row["Loading Status"] || "Pending",
-  jenisBarang: row["Product"] || "Tidak ada data",
-  berat: row["Plan Qty"] || 0,
-  tanggalPengiriman: row["Laycan Start"] || "TBD",
-  namaPengirim: row["Company"] || "Tidak ada data",
-  alamatPengirim: row["Terminal"] || "Tidak ada data",
+  no: row["EXCEL ID"] || row.excel_id || "",
+  status: row["Loading Status"] || row.loading_status || "Pending",
+  jenisBarang: row["Product"] || row.product || "Tidak ada data",
+  berat: row["Plan Qty"] || row.plan_qty || 0,
+  tanggalPengiriman: row["Laycan Start"] || row.laycan_start || "TBD",
+  namaPengirim: row["Company"] || row.company || "Tidak ada data",
+  alamatPengirim: row["Terminal"] || row.terminal || "Tidak ada data",
   namaPenerima: row["Base Customer"] || "Tidak ada data",
-  alamatPenerima: row["Country"] || "Tidak ada data"
+  alamatPenerima: row["Country"] || row.country || "Tidak ada data"
 });
