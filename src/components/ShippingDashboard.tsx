@@ -15,7 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Search, Building, Truck, Weight, Ship, Calendar, MapPin, DollarSign, Package } from "lucide-react";
+import { Loader2, Search, Building, Truck, Weight, Ship, Calendar, MapPin, DollarSign, Package, Ban, Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const ITEMS_PER_PAGE = 10;
@@ -66,6 +66,29 @@ const ShippingDashboard = () => {
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const currentData = filteredData.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
+  const handleReject = async (shipmentId: string) => {
+    try {
+      const { error } = await supabase
+        .from('shipping_schedules')
+        .update({ loading_status: 'rejected' })
+        .eq('excel_id', shipmentId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Status Updated",
+        description: "Shipment has been marked as rejected",
+      });
+    } catch (error) {
+      console.error('Error rejecting shipment:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to reject shipment",
+      });
+    }
+  };
+
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
       case 'complete':
@@ -79,6 +102,8 @@ const ShippingDashboard = () => {
       case 'ok':
         return 'bg-mint-50 text-mint-700 border-mint-200';
       case 'unsold':
+        return 'bg-mint-50 text-mint-700 border-mint-200';
+      case 'rejected':
         return 'bg-mint-50 text-mint-700 border-mint-200';
       default:
         return 'bg-mint-50 text-mint-700 border-mint-200';
@@ -167,149 +192,159 @@ const ShippingDashboard = () => {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="border-mint-200 hover:bg-mint-50 text-mint-700"
-                          onClick={() => setSelectedShipment(shipment)}
-                        >
-                          View Details
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-3xl">
-                        <DialogHeader>
-                          <DialogTitle className="text-2xl font-semibold text-mint-900 mb-6">
-                            Shipping Details
-                          </DialogTitle>
-                        </DialogHeader>
-                        <ScrollArea className="max-h-[80vh] px-1">
-                          <div className="space-y-8">
-                            {/* Basic Info Section */}
-                            <div className="space-y-4">
-                              <h3 className="text-lg font-semibold text-mint-800 border-b pb-2">
-                                Basic Information
-                              </h3>
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <InfoItem
-                                  icon={Package}
-                                  label="Excel ID"
-                                  value={selectedShipment?.excel_id}
-                                />
-                                <InfoItem
-                                  icon={Building}
-                                  label="Company"
-                                  value={selectedShipment?.company}
-                                />
-                                <InfoItem
-                                  icon={Truck}
-                                  label="Terminal"
-                                  value={selectedShipment?.terminal}
-                                />
-                                <InfoItem
-                                  icon={Weight}
-                                  label="Plan Quantity"
-                                  value={selectedShipment?.plan_qty?.toLocaleString()}
-                                />
-                                <InfoItem
-                                  icon={Weight}
-                                  label="Total Quantity"
-                                  value={selectedShipment?.total_qty?.toLocaleString()}
-                                />
+                    <div className="flex items-center gap-2">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="border-mint-200 hover:bg-mint-50 text-mint-700 h-8 w-8"
+                            onClick={() => setSelectedShipment(shipment)}
+                          >
+                            <Info className="h-4 w-4" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-3xl">
+                          <DialogHeader>
+                            <DialogTitle className="text-2xl font-semibold text-mint-900 mb-6">
+                              Shipping Details
+                            </DialogTitle>
+                          </DialogHeader>
+                          <ScrollArea className="max-h-[80vh] px-1">
+                            <div className="space-y-8">
+                              {/* Basic Info Section */}
+                              <div className="space-y-4">
+                                <h3 className="text-lg font-semibold text-mint-800 border-b pb-2">
+                                  Basic Information
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  <InfoItem
+                                    icon={Package}
+                                    label="Excel ID"
+                                    value={selectedShipment?.excel_id}
+                                  />
+                                  <InfoItem
+                                    icon={Building}
+                                    label="Company"
+                                    value={selectedShipment?.company}
+                                  />
+                                  <InfoItem
+                                    icon={Truck}
+                                    label="Terminal"
+                                    value={selectedShipment?.terminal}
+                                  />
+                                  <InfoItem
+                                    icon={Weight}
+                                    label="Plan Quantity"
+                                    value={selectedShipment?.plan_qty?.toLocaleString()}
+                                  />
+                                  <InfoItem
+                                    icon={Weight}
+                                    label="Total Quantity"
+                                    value={selectedShipment?.total_qty?.toLocaleString()}
+                                  />
+                                </div>
                               </div>
-                            </div>
 
-                            {/* Shipping Details Section */}
-                            <div className="space-y-4">
-                              <h3 className="text-lg font-semibold text-mint-800 border-b pb-2">
-                                Shipping Information
-                              </h3>
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <InfoItem
-                                  icon={Ship}
-                                  label="Vessel"
-                                  value={selectedShipment?.vessel}
-                                />
-                                <InfoItem
-                                  icon={Calendar}
-                                  label="Laycan Start"
-                                  value={selectedShipment?.laycan_start}
-                                />
-                                <InfoItem
-                                  icon={Calendar}
-                                  label="Laycan Stop"
-                                  value={selectedShipment?.laycan_stop}
-                                />
-                                <InfoItem
-                                  icon={MapPin}
-                                  label="Country"
-                                  value={selectedShipment?.country}
-                                />
-                                <InfoItem
-                                  icon={MapPin}
-                                  label="Region"
-                                  value={selectedShipment?.region}
-                                />
+                              {/* Shipping Details Section */}
+                              <div className="space-y-4">
+                                <h3 className="text-lg font-semibold text-mint-800 border-b pb-2">
+                                  Shipping Information
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  <InfoItem
+                                    icon={Ship}
+                                    label="Vessel"
+                                    value={selectedShipment?.vessel}
+                                  />
+                                  <InfoItem
+                                    icon={Calendar}
+                                    label="Laycan Start"
+                                    value={selectedShipment?.laycan_start}
+                                  />
+                                  <InfoItem
+                                    icon={Calendar}
+                                    label="Laycan Stop"
+                                    value={selectedShipment?.laycan_stop}
+                                  />
+                                  <InfoItem
+                                    icon={MapPin}
+                                    label="Country"
+                                    value={selectedShipment?.country}
+                                  />
+                                  <InfoItem
+                                    icon={MapPin}
+                                    label="Region"
+                                    value={selectedShipment?.region}
+                                  />
+                                </div>
                               </div>
-                            </div>
 
-                            {/* Commercial Details Section */}
-                            <div className="space-y-4">
-                              <h3 className="text-lg font-semibold text-mint-800 border-b pb-2">
-                                Commercial Details
-                              </h3>
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <InfoItem
-                                  icon={DollarSign}
-                                  label="Price Code"
-                                  value={selectedShipment?.price_code}
-                                />
-                                <InfoItem
-                                  icon={DollarSign}
-                                  label="Fixed/Index Linked"
-                                  value={selectedShipment?.fixed_index_linked}
-                                />
-                                <InfoItem
-                                  icon={Weight}
-                                  label="CV Typical"
-                                  value={selectedShipment?.cv_typical}
-                                />
-                                <InfoItem
-                                  icon={Weight}
-                                  label="CV Acceptable"
-                                  value={selectedShipment?.cv_acceptable}
-                                />
+                              {/* Commercial Details Section */}
+                              <div className="space-y-4">
+                                <h3 className="text-lg font-semibold text-mint-800 border-b pb-2">
+                                  Commercial Details
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  <InfoItem
+                                    icon={DollarSign}
+                                    label="Price Code"
+                                    value={selectedShipment?.price_code}
+                                  />
+                                  <InfoItem
+                                    icon={DollarSign}
+                                    label="Fixed/Index Linked"
+                                    value={selectedShipment?.fixed_index_linked}
+                                  />
+                                  <InfoItem
+                                    icon={Weight}
+                                    label="CV Typical"
+                                    value={selectedShipment?.cv_typical}
+                                  />
+                                  <InfoItem
+                                    icon={Weight}
+                                    label="CV Acceptable"
+                                    value={selectedShipment?.cv_acceptable}
+                                  />
+                                </div>
                               </div>
-                            </div>
 
-                            {/* Additional Details Section */}
-                            <div className="space-y-4">
-                              <h3 className="text-lg font-semibold text-mint-800 border-b pb-2">
-                                Additional Information
-                              </h3>
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <InfoItem
-                                  icon={Weight}
-                                  label="BC Tonnage"
-                                  value={selectedShipment?.bc_tonnage?.toLocaleString()}
-                                />
-                                <InfoItem
-                                  icon={Weight}
-                                  label="AI Tonnage"
-                                  value={selectedShipment?.ai_tonnage?.toLocaleString()}
-                                />
-                                <InfoItem
-                                  icon={Weight}
-                                  label="Expected Blended CV"
-                                  value={selectedShipment?.expected_blended_cv}
-                                />
+                              {/* Additional Details Section */}
+                              <div className="space-y-4">
+                                <h3 className="text-lg font-semibold text-mint-800 border-b pb-2">
+                                  Additional Information
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  <InfoItem
+                                    icon={Weight}
+                                    label="BC Tonnage"
+                                    value={selectedShipment?.bc_tonnage?.toLocaleString()}
+                                  />
+                                  <InfoItem
+                                    icon={Weight}
+                                    label="AI Tonnage"
+                                    value={selectedShipment?.ai_tonnage?.toLocaleString()}
+                                  />
+                                  <InfoItem
+                                    icon={Weight}
+                                    label="Expected Blended CV"
+                                    value={selectedShipment?.expected_blended_cv}
+                                  />
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </ScrollArea>
-                      </DialogContent>
-                    </Dialog>
+                          </ScrollArea>
+                        </DialogContent>
+                      </Dialog>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="border-mint-200 hover:bg-mint-50 text-mint-700 h-8 w-8"
+                        onClick={() => handleReject(shipment.excel_id)}
+                      >
+                        <Ban className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
