@@ -26,13 +26,14 @@ export const EditShippingModal = ({ isOpen, onClose, item, onUpdate }: EditShipp
 
   useEffect(() => {
     if (item) {
+      console.log("Setting form data with item:", item);
       setFormData({
-        product: item.jenisBarang || "",
-        plan_qty: item.berat || "",
-        company: item.namaPengirim || "",
-        terminal: item.alamatPengirim || "",
-        country: item.alamatPenerima || "",
-        loading_status: item.status || ""
+        product: item.product || "",
+        plan_qty: item.plan_qty?.toString() || "",
+        company: item.company || "",
+        terminal: item.terminal || "",
+        country: item.country || "",
+        loading_status: item.loading_status || ""
       });
     }
   }, [item]);
@@ -40,7 +41,7 @@ export const EditShippingModal = ({ isOpen, onClose, item, onUpdate }: EditShipp
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      if (!item?.no) {
+      if (!item?.excel_id) {
         toast({
           variant: "destructive",
           title: "Error",
@@ -48,6 +49,11 @@ export const EditShippingModal = ({ isOpen, onClose, item, onUpdate }: EditShipp
         });
         return;
       }
+
+      console.log("Updating record with data:", {
+        excel_id: item.excel_id,
+        formData
+      });
 
       const { error } = await supabase
         .from('shipping_schedules')
@@ -59,7 +65,7 @@ export const EditShippingModal = ({ isOpen, onClose, item, onUpdate }: EditShipp
           country: formData.country,
           loading_status: formData.loading_status
         })
-        .eq('excel_id', item.no);
+        .eq('excel_id', item.excel_id);
 
       if (error) throw error;
 
@@ -87,7 +93,7 @@ export const EditShippingModal = ({ isOpen, onClose, item, onUpdate }: EditShipp
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Edit Shipping Record #{item.no}</DialogTitle>
+          <DialogTitle>Edit Shipping Record #{item.excel_id}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid gap-4 py-4">
