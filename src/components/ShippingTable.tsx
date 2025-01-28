@@ -95,7 +95,11 @@ export const ShippingTable = ({ data, showCombinedData = false }: ShippingTableP
   }
 
   const filteredDbData = filterData(dbData);
-  const filteredExcelData = filterData(data);
+  // Filter out Excel data that already exists in the database
+  const newExcelData = data.filter(excelRow => 
+    !dbData.some(dbRow => dbRow.excel_id === excelRow["EXCEL ID"])
+  );
+  const filteredExcelData = filterData(newExcelData);
 
   return (
     <div className="space-y-6">
@@ -183,7 +187,7 @@ export const ShippingTable = ({ data, showCombinedData = false }: ShippingTableP
       <div className="flex items-center justify-between p-4 rounded-lg border bg-card">
         <span className="text-sm text-muted-foreground">
           Total: {filteredDbData.length + filteredExcelData.length} items
-          ({filteredDbData.length} from database, {filteredExcelData.length} from Excel)
+          ({filteredDbData.length} from database, {filteredExcelData.length} new from Excel)
         </span>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Filter className="h-4 w-4" />
