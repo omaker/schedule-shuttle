@@ -69,19 +69,19 @@ const ShippingDashboard = () => {
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
       case 'complete':
-        return 'bg-emerald-50 text-emerald-600 border-emerald-200';
+        return 'bg-mint-50 text-mint-700 border-mint-200';
       case 'in progress':
       case 'otw':
-        return 'bg-sky-50 text-sky-600 border-sky-200';
+        return 'bg-mint-50 text-mint-700 border-mint-200';
       case 'pending':
       case 'not ok':
-        return 'bg-amber-50 text-amber-600 border-amber-200';
+        return 'bg-mint-50 text-mint-700 border-mint-200';
       case 'ok':
-        return 'bg-emerald-50 text-emerald-600 border-emerald-200';
+        return 'bg-mint-50 text-mint-700 border-mint-200';
       case 'unsold':
-        return 'bg-rose-50 text-rose-600 border-rose-200';
+        return 'bg-mint-50 text-mint-700 border-mint-200';
       default:
-        return 'bg-slate-50 text-slate-600 border-slate-200';
+        return 'bg-mint-50 text-mint-700 border-mint-200';
     }
   };
 
@@ -103,7 +103,7 @@ const ShippingDashboard = () => {
 
   return (
     <div className="space-y-6">
-      <Card className="p-6 bg-white shadow-sm border-mint-100">
+      <Card className="p-6 bg-mint-50/30 shadow-sm border-mint-100">
         <div className="flex flex-col sm:flex-row gap-4 items-center justify-between mb-6">
           <div className="relative w-full max-w-md">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-mint-400 h-4 w-4" />
@@ -137,7 +137,7 @@ const ShippingDashboard = () => {
           </div>
         </div>
 
-        <div className="rounded-lg border border-mint-100 overflow-hidden">
+        <div className="rounded-lg border border-mint-100 overflow-hidden bg-white">
           <Table>
             <TableHeader>
               <TableRow className="bg-mint-50/50">
@@ -157,10 +157,10 @@ const ShippingDashboard = () => {
                   className="hover:bg-mint-50/30 transition-colors"
                 >
                   <TableCell className="font-medium text-mint-900">{shipment.excel_id || 'N/A'}</TableCell>
-                  <TableCell className="text-slate-600">{shipment.product || 'N/A'}</TableCell>
-                  <TableCell className="text-slate-600">{shipment.company || 'N/A'}</TableCell>
-                  <TableCell className="text-slate-600">{shipment.terminal || 'N/A'}</TableCell>
-                  <TableCell className="text-slate-600">{shipment.plan_qty?.toLocaleString() || '0'}</TableCell>
+                  <TableCell className="text-mint-700">{shipment.product || 'N/A'}</TableCell>
+                  <TableCell className="text-mint-700">{shipment.company || 'N/A'}</TableCell>
+                  <TableCell className="text-mint-700">{shipment.terminal || 'N/A'}</TableCell>
+                  <TableCell className="text-mint-700">{shipment.plan_qty?.toLocaleString() || '0'}</TableCell>
                   <TableCell>
                     <Badge className={`${getStatusColor(shipment.loading_status)}`}>
                       {shipment.loading_status || 'N/A'}
