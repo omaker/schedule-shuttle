@@ -11,17 +11,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 
 const Index = () => {
-  const [shippingData, setShippingData] = useState<any[]>(() => {
-    const savedData = localStorage.getItem('shippingData');
-    return savedData ? JSON.parse(savedData) : [];
-  });
+  // Remove localStorage and just use state directly
+  const [shippingData, setShippingData] = useState<any[]>([]);
   
   const { toast } = useToast();
   const navigate = useNavigate();
 
   const handleDataReceived = (data: any[]) => {
     setShippingData(data);
-    localStorage.setItem('shippingData', JSON.stringify(data));
   };
 
   const handleDownloadTemplate = () => {
