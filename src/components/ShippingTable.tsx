@@ -1,7 +1,7 @@
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
-import { Search, Loader2, Filter, LayoutGrid, List, Rocket } from "lucide-react";
+import { Search, Loader2, Filter, LayoutGrid, List } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ShippingCard } from "./ShippingCard";
@@ -55,71 +55,63 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
   const getStatusColor = (status: string) => {
     switch (status?.toLowerCase()) {
       case 'complete':
-        return 'bg-green-500/20 text-green-300';
+        return 'bg-green-500/10 text-green-500 border-green-500/20';
       case 'in progress':
       case 'otw':
-        return 'bg-blue-500/20 text-blue-300';
+        return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
       case 'pending':
       case 'not ok':
-        return 'bg-yellow-500/20 text-yellow-300';
+        return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
       case 'ok':
-        return 'bg-green-500/20 text-green-300';
+        return 'bg-green-500/10 text-green-500 border-green-500/20';
       case 'unsold':
-        return 'bg-red-500/20 text-red-300';
+        return 'bg-red-500/10 text-red-500 border-red-500/20';
       default:
-        return 'bg-gray-500/20 text-gray-300';
+        return 'bg-gray-500/10 text-gray-500 border-gray-500/20';
     }
   };
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 bg-gradient-to-br from-slate-900 to-slate-800 p-8 rounded-xl shadow-lg">
-      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-slate-800/50 p-4 rounded-lg backdrop-blur-sm border border-slate-700">
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between p-4 rounded-lg border bg-card">
         <div className="relative w-full max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400 h-4 w-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
           <Input
             placeholder="Search shipping schedules..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-slate-900/50 border-slate-700 text-blue-100 placeholder:text-blue-300/50"
+            className="pl-10"
           />
         </div>
         <div className="flex items-center gap-2">
           <Button
             variant={view === "grid" ? "default" : "outline"}
             onClick={() => setView("grid")}
-            className={`w-28 gap-2 ${
-              view === "grid" 
-                ? "bg-blue-500 hover:bg-blue-600 text-white" 
-                : "border-blue-500 text-blue-400 hover:bg-blue-500/20"
-            }`}
+            className="w-28"
           >
-            <LayoutGrid className="h-4 w-4" />
+            <LayoutGrid className="h-4 w-4 mr-2" />
             Grid
           </Button>
           <Button
             variant={view === "compact" ? "default" : "outline"}
             onClick={() => setView("compact")}
-            className={`w-28 gap-2 ${
-              view === "compact" 
-                ? "bg-blue-500 hover:bg-blue-600 text-white" 
-                : "border-blue-500 text-blue-400 hover:bg-blue-500/20"
-            }`}
+            className="w-28"
           >
-            <List className="h-4 w-4" />
+            <List className="h-4 w-4 mr-2" />
             Compact
           </Button>
         </div>
       </div>
 
-      <ScrollArea className="h-[calc(100vh-16rem)] rounded-lg bg-slate-900/50 backdrop-blur-sm">
+      <ScrollArea className="h-[calc(100vh-16rem)]">
         <div className={`
           ${view === "grid" 
             ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6" 
@@ -138,11 +130,11 @@ export const ShippingTable = ({ data }: ShippingTableProps) => {
         <ScrollBar orientation="vertical" />
       </ScrollArea>
 
-      <div className="flex items-center justify-between bg-slate-800/50 p-4 rounded-lg backdrop-blur-sm border border-slate-700">
-        <span className="text-sm text-blue-300">
+      <div className="flex items-center justify-between p-4 rounded-lg border bg-card">
+        <span className="text-sm text-muted-foreground">
           Showing {filteredData.length} of {data.length} entries
         </span>
-        <div className="flex items-center gap-2 text-sm text-blue-300">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Filter className="h-4 w-4" />
           <span>Use search to filter results</span>
         </div>
@@ -161,18 +153,5 @@ const mapRowToShippingItem = (row: any) => ({
   namaPengirim: row["Company"] || "Tidak ada data",
   alamatPengirim: row["Terminal"] || "Tidak ada data",
   namaPenerima: row["Base Customer"] || "Tidak ada data",
-  alamatPenerima: row["Country"] || "Tidak ada data",
-  year: row["Year"] || "Tidak ada data",
-  month: row["Month"] || "Tidak ada data",
-  finMonth: row["Fin Month"] || "Tidak ada data",
-  vessel: row["Vessel"] || "Tidak ada data",
-  shipCode: row["Ship Code"] || "Tidak ada data",
-  region: row["Region"] || "Tidak ada data",
-  terminal: row["Terminal"] || "Tidak ada data",
-  contractPeriod: row["Contract Period"] || "Tidak ada data",
-  priceCode: row["Price Code"] || "Tidak ada data",
-  price_fob_vessel: row["Price FOB Vessel"] || null,
-  revenue: row["Revenue"] || null,
-  cv_typical: row["CV Typical"] || null,
-  cv_acceptable: row["CV Acceptable"] || null
+  alamatPenerima: row["Country"] || "Tidak ada data"
 });
