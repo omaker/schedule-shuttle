@@ -6,8 +6,8 @@ export const formatShippingDate = (month: number | null): string => {
   const targetDate = new Date(baseDate);
   targetDate.setDate(baseDate.getDate() + Math.floor(month));
   
+  // For Month field, only show Month and Year
   return targetDate.toLocaleDateString('id-ID', {
-    day: 'numeric',
     month: 'long',
     year: 'numeric'
   });
