@@ -13,7 +13,7 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import { Loader2, Package, Ship, Calendar, Search, Eye, Trash2 } from "lucide-react";
+import { Loader2, Package, Ship, Calendar, Search, Eye, Trash2, Info, DollarSign, Calculator, Activity, Scale, FileText, MapPin, Clock, Building, Truck, Weight } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -52,7 +52,6 @@ import {
 import { useNavigate } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { formatShippingDate, formatFinMonth } from "@/utils/dateFormatters";
-import { Info, DollarSign, Calculator, Activity, Scale, FileText, MapPin, Clock } from "lucide-react";
 
 export const ShippingDashboard = () => {
   const [data, setData] = useState<any[]>([]);
